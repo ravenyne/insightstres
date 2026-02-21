@@ -1,0 +1,5 @@
+
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="w-5 h-5 text-gray-400" width="24" height="24" viewBox="0 0 24 24">
+                    <image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABc0lEQVR4AcySTTIEQRCFm3AQzoEI52CBnb8de+zZ+dux4RwicA4OIvB9E1U1Ez05XT2DiJnI15n98mW9nO5ebP75NzcGm/zRF/CVYC3HbXf0+QcXHPEI1kAOazl7mQtzzcAtj5n8BodgKcFazp4a6DhqBvtp7Ih8A/IjspaDarLGegw1g1Um3PSO3A45e2ravXJfMyjCWYuawRsHL4A90A45e2ravXJfM7hNyivyAVAvrOWgmqyxHoPiMXKEeKK+BG56Tf5MsJazpwY6jpqBUydctsAryGEtZy9zYe5j4KBbrlOoF9ZyUN2huFvxy26XwTJnnwG/9Ul4p38PdkAYkwwccPg0nBqSLqFWE5cZdlIVGWzQc4DUnHPxa5mEFfpqSI3LOGtdEBlsp+4uOdwKPscHhRq1lE2etR4gMshbPA8U/S5Zm2fLVGTgc1XgduY+yNo8W2Yig9L8iyIy8KU9zHB4OBcZjL60aXzCuchgmkOr2h8AAAD//1yQzxcAAAAGSURBVAMAHVc/MXTi9h8AAAAASUVORK5CYII=" x="0" y="0" width="24" height="24"/>
+                  </svg>
