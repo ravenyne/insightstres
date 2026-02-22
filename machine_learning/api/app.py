@@ -93,10 +93,10 @@ def index():
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("🚀 Stress Assessment ML API")
+    print("[-] Stress Assessment ML API")
     print("=" * 50)
-    print(f"✅ Model loaded: {MODEL_PATH}")
-    print(f"✅ Features: {len(feature_list)} columns")
-    print(f"✅ Server running on: http://127.0.0.1:5000")
+    print(f"[+] Model loaded: {MODEL_PATH}")
+    print(f"[+] Features: {len(feature_list)} columns")
+    print(f"[+] Server running on: http://127.0.0.1:5000")
     print("=" * 50)
     app.run(port=5000, debug=True)
