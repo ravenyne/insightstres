@@ -143,6 +143,17 @@ Ensure your Laravel `.env` points to the local Flask API:
 ML_API_URL=http://127.0.0.1:5000
 ```
 
+### 5. Default Credentials (After Seeding)
+After running `php artisan migrate --seed`, you can log in using these accounts:
+
+**Admin:**
+- Email: `rachel@insightstres.lain.ch`
+- Password: `marushy00`
+
+**User:**
+- Email: `demouser@insightstres.lain.ch`
+- Password: `demouser123`
+
 ---
 
 ## Deployment Guide
