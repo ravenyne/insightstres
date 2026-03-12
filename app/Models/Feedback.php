@@ -20,6 +20,8 @@ class Feedback extends Model
         'page_url',
         'status',
         'admin_notes',
+        'stress_condition',
+        'related_feature',
     ];
 
     /**

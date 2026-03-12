@@ -15,12 +15,19 @@ class FeedbackController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:bug,feature,improvement,other',
+            'type' => 'required|string', // Validasi Frontend bisa dibatasi
             'rating' => 'nullable|integer|min:1|max:5',
             'subject' => 'required|string|max:255',
             'message' => 'required|string',
             'page_url' => 'nullable|string',
+            'related_feature' => 'nullable|string',
         ]);
+
+        // Ambil assessment terakhir dari user untuk kondisi stress
+        $latestAssessment = \App\Models\StressAssessment::where('user_id', Auth::id())
+                                ->orderBy('created_at', 'desc')
+                                ->first();
+        $stressCondition = $latestAssessment ? $latestAssessment->stress_category : null;
 
         $feedback = Feedback::create([
             'user_id' => Auth::id(),
@@ -30,6 +37,8 @@ class FeedbackController extends Controller
             'message' => $request->message,
             'page_url' => $request->page_url ?? url()->previous(),
             'status' => 'new',
+            'stress_condition' => $stressCondition,
+            'related_feature' => $request->related_feature,
         ]);
 
         // Award feedback badge

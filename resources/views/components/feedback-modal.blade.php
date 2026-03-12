@@ -8,44 +8,54 @@
     </button>
 
     {{-- Feedback Modal --}}
-    <div id="feedback-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            {{-- Background overlay --}}
-            <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true"></div>
-
+    <div id="feedback-modal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
             {{-- Modal panel --}}
-            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-y-auto">
                 <form id="feedback-form">
                     @csrf
-                    <div class="bg-white px-6 pt-6 pb-4">
+                    <div class="p-6">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-2xl font-bold text-gray-900">
-                                Berikan Feedback
+                                {{ __('Give Feedback') }}
                             </h3>
                             <button type="button" id="close-feedback-modal" class="text-gray-400 hover:text-gray-600 transition">
                                 <i data-lucide="x" class="w-6 h-6"></i>
                             </button>
                         </div>
 
-                        <p class="text-sm text-gray-600 mb-6">
-                            Bantu kami meningkatkan platform dengan memberikan feedback Anda
+                        <p class="text-sm text-gray-600 mb-4">
+                            {{ __('Help us improve the platform by providing your feedback') }}
                         </p>
 
                         {{-- Type Selection --}}
                         <div class="mb-4">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tipe Feedback</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Feedback</label>
                             <select name="type" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                                <option value="">Pilih tipe...</option>
-                                <option value="bug">🐛 Bug Report</option>
-                                <option value="feature">✨ Feature Request</option>
-                                <option value="improvement">📈 Improvement</option>
-                                <option value="other">💬 Other</option>
+                                <option value="">Pilih Kategori...</option>
+                                <option value="pengalaman_assessment">Pengalaman Assessment</option>
+                                <option value="saran_fitur">Saran Fitur</option>
+                                <option value="masalah_teknis">Masalah Teknis</option>
+                                <option value="kualitas_konten">Kualitas Konten</option>
+                                <option value="kesehatan_mental">Kesehatan Mental</option>
+                            </select>
+                        </div>
+
+                        {{-- Fitur Terkait --}}
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Fitur Terkait (Opsional)</label>
+                            <select name="related_feature" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="">Pilih fitur...</option>
+                                <option value="Stress Assessment">Stress Assessment</option>
+                                <option value="Breathing Exercise">Breathing Exercise</option>
+                                <option value="Meditation Guide">Meditation Guide</option>
+                                <option value="Stress Analytics">Stress Analytics</option>
                             </select>
                         </div>
 
                         {{-- Rating --}}
                         <div class="mb-4">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Rating (Opsional)</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">{{ __('Rating (Optional)') }}</label>
                             <div class="flex gap-2">
                                 <button type="button" class="rating-btn w-12 h-12 rounded-lg border-2 border-gray-300 hover:border-yellow-400 hover:bg-yellow-50 transition flex items-center justify-center" data-rating="1">
                                     <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
@@ -78,28 +88,28 @@
 
                         {{-- Subject --}}
                         <div class="mb-4">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Subjek</label>
-                            <input type="text" name="subject" required maxlength="255" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Ringkasan singkat...">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">{{ __('Subject') }}</label>
+                            <input type="text" name="subject" required maxlength="255" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="{{ __('Short summary...') }}">
                         </div>
 
                         {{-- Message --}}
                         <div class="mb-4">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Pesan</label>
-                            <textarea name="message" required rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none" placeholder="Jelaskan feedback Anda secara detail..."></textarea>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">{{ __('Message') }}</label>
+                            <textarea name="message" required rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none h-24" placeholder="{{ __('Explain your feedback in detail...') }}"></textarea>
                         </div>
 
                         {{-- Hidden page URL --}}
                         <input type="hidden" name="page_url" id="page-url">
-                    </div>
 
-                    {{-- Footer --}}
-                    <div class="bg-gray-50 px-6 py-4 flex gap-3 justify-end">
-                        <button type="button" id="cancel-feedback" class="px-6 py-2.5 border border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-100 transition">
-                            Batal
-                        </button>
-                        <button type="submit" class="px-6 py-2.5 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition">
-                            Kirim Feedback
-                        </button>
+                        {{-- Footer --}}
+                        <div class="flex justify-end gap-3 pt-3 mt-4 border-t border-gray-100">
+                            <button type="button" id="cancel-feedback" class="px-6 py-2 border border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-100 transition">
+                                {{ __('Cancel') }}
+                            </button>
+                            <button type="submit" class="px-6 py-2 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition">
+                                {{ __('Send Feedback') }}
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -183,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(feedbackForm);
         const submitBtn = feedbackForm.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Mengirim...';
+        submitBtn.textContent = '{{ __("Sending...") }}';
 
         fetch('{{ route("feedback.store") }}', {
             method: 'POST',
@@ -200,16 +210,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert(data.message);
                 closeModal();
             } else {
-                alert('Gagal mengirim feedback. Silakan coba lagi.');
+                alert('{{ __("Failed to send feedback. Please try again.") }}');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan. Silakan coba lagi.');
+            alert('{{ __("An error occurred. Please try again.") }}');
         })
         .finally(() => {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Kirim Feedback';
+            submitBtn.textContent = '{{ __("Send Feedback") }}';
         });
     });
 
