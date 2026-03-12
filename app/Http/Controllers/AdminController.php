@@ -25,8 +25,10 @@ class AdminController extends Controller
 
         // Search
         if ($search = $request->get('search')) {
-            $query->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
+            $query->where('title_id', 'like', "%{$search}%")
+                  ->orWhere('title_en', 'like', "%{$search}%")
+                  ->orWhere('content_id', 'like', "%{$search}%")
+                  ->orWhere('content_en', 'like', "%{$search}%");
         }
 
         // Filter by category
@@ -62,17 +64,27 @@ class AdminController extends Controller
     public function storeTip(Request $request)
     {
         $request->validate([
-            'title' => 'required|max:255',
+            'title_id' => 'required|max:255',
+            'title_en' => 'required|max:255',
             'category' => 'required|in:breathing,sleep,exercise,mindfulness,study,general',
-            'content' => 'required',
-            'icon' => 'nullable|string'
+            'content_id' => 'required',
+            'content_en' => 'required',
+            'target_condition' => 'required|in:Distress,Eustress,Semua Kondisi',
+            'read_duration' => 'nullable|integer|min:1',
+            'is_evidence_based' => 'nullable|boolean',
+            'is_ai_recommended' => 'nullable|boolean'
         ]);
 
         Tip::create([
-            'title' => $request->title,
+            'title_id' => $request->title_id,
+            'title_en' => $request->title_en,
             'category' => $request->category,
-            'content' => $request->content,
-            'icon' => $request->icon ?? 'book-open',
+            'content_id' => $request->content_id,
+            'content_en' => $request->content_en,
+            'target_condition' => $request->target_condition,
+            'read_duration' => $request->read_duration,
+            'is_evidence_based' => $request->has('is_evidence_based'),
+            'is_ai_recommended' => $request->has('is_ai_recommended'),
             'views' => 0
         ]);
 
@@ -90,18 +102,28 @@ class AdminController extends Controller
     public function updateTip(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required|max:255',
+            'title_id' => 'required|max:255',
+            'title_en' => 'required|max:255',
             'category' => 'required|in:breathing,sleep,exercise,mindfulness,study,general',
-            'content' => 'required',
-            'icon' => 'nullable|string'
+            'content_id' => 'required',
+            'content_en' => 'required',
+            'target_condition' => 'required|in:Distress,Eustress,Semua Kondisi',
+            'read_duration' => 'nullable|integer|min:1',
+            'is_evidence_based' => 'nullable|boolean',
+            'is_ai_recommended' => 'nullable|boolean'
         ]);
 
         $tip = Tip::findOrFail($id);
         $tip->update([
-            'title' => $request->title,
+            'title_id' => $request->title_id,
+            'title_en' => $request->title_en,
             'category' => $request->category,
-            'content' => $request->content,
-            'icon' => $request->icon
+            'content_id' => $request->content_id,
+            'content_en' => $request->content_en,
+            'target_condition' => $request->target_condition,
+            'read_duration' => $request->read_duration,
+            'is_evidence_based' => $request->has('is_evidence_based'),
+            'is_ai_recommended' => $request->has('is_ai_recommended')
         ]);
 
         return redirect()->route('admin.tips')->with('success', 'Artikel berhasil diperbarui.');
@@ -150,9 +172,10 @@ class AdminController extends Controller
         $avgScorePercentage = round(($avgScore / 2) * 100);
         
         
-        // Count unique students whose LATEST assessment is Distress
+        // Count unique students whose LATEST assessment is Distress in the last 30 days
         $highStressCount = User::whereHas('assessments', function($query) {
             $query->where('numeric_score', 2)
+                  ->where('created_at', '>=', now()->subDays(30))
                   ->whereRaw('id = (SELECT id FROM stress_assessments WHERE user_id = users.id ORDER BY created_at DESC LIMIT 1)');
         })->count();
         
@@ -176,6 +199,29 @@ class AdminController extends Controller
             'high' => StressAssessment::where('numeric_score', '=', 2)->count(),   // Distress
         ];
         
+        // Calculate AI Insight based on 30 day trend
+        $recentHighCount = StressAssessment::where('numeric_score', 2)->where('created_at', '>=', now()->subDays(30))->count();
+        $previousHighCount = StressAssessment::where('numeric_score', 2)->whereBetween('created_at', [now()->subDays(60), now()->subDays(30)])->count();
+        
+        $aiInsightMessage = '';
+        $isEn = app()->getLocale() === 'en';
+
+        if ($recentHighCount === 0 && $previousHighCount === 0) {
+            $aiInsightMessage = $isEn
+                ? 'Student stress levels are currently monitored as stable and low. Continue maintaining the existing student wellbeing programs.'
+                : 'Saat ini tingkat stres mahasiswa terpantau stabil dan rendah. Terus pertahankan program kesejahteraan mahasiswa yang ada.';
+        } elseif ($recentHighCount > $previousHighCount) {
+            $percentageIncrease = $previousHighCount > 0 ? round((($recentHighCount - $previousHighCount) / $previousHighCount) * 100) : 100;
+            $aiInsightMessage = $isEn
+                ? "Based on the latest assessment data, the system detected that student stress levels show a pattern of <b>increasing by {$percentageIncrease}%</b> compared to last month. This pattern often appears during assignment deadlines or exam periods. <br><br><b>System Recommendations:</b><br>&bull; Encourage students to complete assessments regularly.<br>&bull; Promote breathing exercises and relaxation techniques.<br>&bull; Consider additional academic support or counseling programs."
+                : "Berdasarkan data assessment terbaru, sistem mendeteksi bahwa tingkat stres mahasiswa menunjukkan pola <b>meningkat sebesar {$percentageIncrease}%</b> dibandingkan bulan lalu. Pola ini biasanya muncul saat periode tugas atau ujian akademik. <br><br><b>Rekomendasi sistem:</b><br>&bull; Dorong mahasiswa untuk melakukan assessment secara rutin.<br>&bull; Promosikan latihan pernapasan dan teknik relaksasi.<br>&bull; Pertimbangkan program dukungan akademik atau konseling tambahan.";
+        } else {
+            $percentageDecrease = $previousHighCount > 0 ? round((($previousHighCount - $recentHighCount) / $previousHighCount) * 100) : 0;
+            $aiInsightMessage = $isEn
+                ? "This month, student stress levels have <b>decreased by {$percentageDecrease}%</b>. The ongoing mental health intervention and education programs are showing positive results. <br><br><b>System Recommendations:</b><br>&bull; Continue sharing new educational articles to maintain this momentum."
+                : "Bulan ini tingkat stres mahasiswa <b>menurun sebesar {$percentageDecrease}%</b>. Program intervensi dan edukasi kesehatan mental yang berjalan menunjukkan hasil positif. <br><br><b>Rekomendasi sistem:</b><br>&bull; Terus bagikan artikel edukasi baru untuk menjaga momentum ini.";
+        }
+
         // Recent assessments (last 5)
         $recentAssessments = StressAssessment::with('user')
                                             ->orderBy('created_at', 'desc')
@@ -189,6 +235,7 @@ class AdminController extends Controller
             'highStressCount',
             'monthlyTrend',
             'stressDistribution',
+            'aiInsightMessage',
             'recentAssessments'
         ));
     }
@@ -198,6 +245,15 @@ class AdminController extends Controller
      */
     public function viewUsers()
     {
+        // Calculate Top Cards Statistics
+        $totalUsers = User::count();
+        $activeUsers = User::whereHas('assessments')->count();
+        
+        $highRiskUsers = User::whereHas('assessments', function($query) {
+            $query->where('numeric_score', 2)
+                  ->whereRaw('id = (SELECT id FROM stress_assessments WHERE user_id = users.id ORDER BY created_at DESC LIMIT 1)');
+        })->count();
+
         $users = User::withCount('assessments')
                     ->with(['assessments' => function($query) {
                         $query->latest()->limit(1);
@@ -211,7 +267,7 @@ class AdminController extends Controller
             return $user;
         });
         
-        return view('admin.users', compact('users'));
+        return view('admin.users', compact('users', 'totalUsers', 'activeUsers', 'highRiskUsers'));
     }
 
     /**
@@ -317,26 +373,65 @@ class AdminController extends Controller
     }
 
     /**
-     * tampilkan statistik dan laporan
+     * tampilkan statistik dan laporan dengan analitik AI
      */
-    public function viewAssessments()
+    public function viewAssessments(Request $request)
     {
+        // 1. Process Filters
+        $semesterFilter = $request->get('semester');
+        $jurusanFilter = $request->get('jurusan');
+        $dateRangeFilter = $request->get('date_range');
+        
+        $assessmentQuery = StressAssessment::query();
+        $userQuery = User::query();
+        
+        if ($semesterFilter) {
+            $userQuery->where('semester', $semesterFilter);
+            $assessmentQuery->whereHas('user', function($q) use ($semesterFilter) {
+                $q->where('semester', $semesterFilter);
+            });
+        }
+        
+        if ($jurusanFilter) {
+            $userQuery->where('jurusan', $jurusanFilter);
+            $assessmentQuery->whereHas('user', function($q) use ($jurusanFilter) {
+                $q->where('jurusan', $jurusanFilter);
+            });
+        }
+        
+        if ($dateRangeFilter) {
+            $dates = explode(' - ', $dateRangeFilter);
+            if (count($dates) == 2) {
+                $startDate = \Carbon\Carbon::createFromFormat('Y-m-d', $dates[0])->startOfDay();
+                $endDate = \Carbon\Carbon::createFromFormat('Y-m-d', $dates[1])->endOfDay();
+                $assessmentQuery->whereBetween('created_at', [$startDate, $endDate]);
+            }
+        }
+
         // Stats Cards
-        $avgScore = StressAssessment::avg('numeric_score') ?? 0;
+        $avgScore = (clone $assessmentQuery)->avg('numeric_score') ?? 0;
         $avgStressPercentage = round(($avgScore / 2) * 100); // 0-2 scale to percentage
         
-        $monthlyAssessments = StressAssessment::whereYear('created_at', now()->year)
+        $monthlyAssessments = (clone $assessmentQuery)->whereYear('created_at', now()->year)
                                             ->whereMonth('created_at', now()->month)
                                             ->count();
         
         
-        $activeStudents = User::has('assessments')->count();
+        $activeStudents = (clone $userQuery)->has('assessments')->count();
         
-        // Count unique students whose LATEST assessment is Distress (not all Distress assessments)
-        $highStressCount = User::whereHas('assessments', function($query) {
+        // Count unique students whose LATEST assessment is Distress
+        $highStressCount = (clone $userQuery)->whereHas('assessments', function($query) {
             $query->where('numeric_score', 2)
                   ->whereRaw('id = (SELECT id FROM stress_assessments WHERE user_id = users.id ORDER BY created_at DESC LIMIT 1)');
         })->count();
+        
+        // Fetch top 5 high-risk students for the new card
+        $highRiskUsersList = (clone $userQuery)->whereHas('assessments', function($query) {
+            $query->where('numeric_score', 2)
+                  ->whereRaw('id = (SELECT id FROM stress_assessments WHERE user_id = users.id ORDER BY created_at DESC LIMIT 1)');
+        })->with(['assessments' => function($query) {
+            $query->latest()->limit(1);
+        }])->take(5)->get();
         
         // Monthly Distribution (last 6 months) - Stacked data
         $monthlyDistribution = [];
@@ -376,32 +471,33 @@ class AdminController extends Controller
         $lingkungan = 0; // work_env, home_env, relaxation_time, activity_conflict
         
         foreach ($allAssessments as $assessment) {
-            // Akademik (Tugas & Ujian)
+            // Akademik
             $akademik += ($assessment->professor_difficulty ?? 0) + ($assessment->conf_academic ?? 0) + 
                         ($assessment->conf_subject ?? 0) + ($assessment->attendance ?? 0);
-            
             // Fisik & Kesehatan
             $fisikKesehatan += ($assessment->sleep_problems ?? 0) + ($assessment->headache ?? 0) + 
                               ($assessment->illness ?? 0) + ($assessment->weight_change ?? 0);
-            
             // Emosional
             $emosional += ($assessment->anxiety ?? 0) + ($assessment->anxiety_2 ?? 0) + 
                          ($assessment->sadness ?? 0) + ($assessment->overwhelmed ?? 0) + 
                          ($assessment->irritated ?? 0);
-            
             // Sosial
             $sosial += ($assessment->relationship_stress ?? 0) + ($assessment->lonely ?? 0) + 
                       ($assessment->competition ?? 0);
-            
             // Lingkungan
             $lingkungan += ($assessment->work_env ?? 0) + ($assessment->home_env ?? 0) + 
                           ($assessment->relaxation_time ?? 0) + ($assessment->activity_conflict ?? 0);
         }
         
-        // Calculate total to get percentages
         $total = $akademik + $fisikKesehatan + $emosional + $sosial + $lingkungan;
         
-        // Convert to percentages (or use raw values if total is 0)
+        $factorData = [0, 0, 0, 0, 0];
+        $isEn = app()->getLocale() === 'en';
+        $factorNames = $isEn
+            ? ['Academic', 'Physical & Health', 'Emotional', 'Social', 'Environment']
+            : ['Akademik', 'Fisik & Kesehatan', 'Emosional', 'Sosial', 'Lingkungan'];
+        $dominantFactorIndex = 0;
+        
         if ($total > 0) {
             $factorData = [
                 round(($akademik / $total) * 100),
@@ -410,8 +506,8 @@ class AdminController extends Controller
                 round(($sosial / $total) * 100),
                 round(($lingkungan / $total) * 100)
             ];
-        } else {
-            $factorData = [0, 0, 0, 0, 0]; // No data yet
+            // Find dominant factor
+            $dominantFactorIndex = array_keys($factorData, max($factorData))[0];
         }
         
         // Jurusan Statistics (Refactored to avoid GROUP BY SQL error)
@@ -439,15 +535,72 @@ class AdminController extends Controller
             ->filter() // Remove nulls (jurusans with 0 active students)
             ->values(); // Reset keys
 
+        // Generate AI Insight
+        $aiInsight = "";
+        $recommendations = [];
+        
+        if ($highStressCount > 10) {
+            $aiInsight = "Sistem mendeteksi tingkat stres (Distress) yang tinggi secara keseluruhan. Faktor dominan penyebab stres adalah tekanan <b>{$factorNames[$dominantFactorIndex]}</b>. Intervensi segera sangat direkomendasikan.";
+            $recommendations = [
+                "Segera hubungi mahasiswa yang berada di kategori Risiko Tinggi untuk menawarkan konseling.",
+                "Adakan survei khusus terkait beban {$factorNames[$dominantFactorIndex]} untuk mengidentifikasi akar masalah.",
+                "Promosikan layanan dukungan psikologis di seluruh media kampus.",
+            ];
+        } elseif ($highStressCount > 0) {
+            $aiInsight = "Sebagian kecil mahasiswa berada dalam kategori Distress. Meskipun stres rata-rata terkendali, ada indikasi tekanan dari faktor <b>{$factorNames[$dominantFactorIndex]}</b>.";
+            $recommendations = [
+                "Fokuskan perhatian pada " . $highStressCount . " mahasiswa di kategori Risiko Tinggi.",
+                "Tingkatkan akses fitur relaksasi pada platform.",
+                "Pertimbangkan program bimbingan akademik ringan.",
+            ];
+        } else {
+            $aiInsight = "Kondisi kesehatan mental mahasiswa terpantau sangat stabil dan cenderung positif. Belum ada deteksi peningkatan tingkat stres (Distress).";
+            $recommendations = [
+                "Pertahankan program kesehatan mental yang sudah berjalan.",
+                "Dorong mahasiswa untuk terus melakukan assessment rutin mingguan.",
+                "Bagikan tip menjaga keseimbangan work-life balance."
+            ];
+        }
+
+        // Generate Key Findings (bilingual)
+        $keyFindings = [];
+        $maxSemesterIndex = array_keys($semesterData, max($semesterData ?: [0]))[0] ?? 0;
+        $keyFindings[] = $isEn
+            ? "Semester " . ($maxSemesterIndex + 1) . " shows the highest average stress level (" . ($semesterData[$maxSemesterIndex] ?? 0) . "%)."
+            : "Semester " . ($maxSemesterIndex + 1) . " menunjukkan rata-rata tingkat stres tertinggi (" . ($semesterData[$maxSemesterIndex] ?? 0) . "%).";
+        
+        if ($total > 0) {
+            $keyFindings[] = $isEn
+                ? "The <b>{$factorNames[$dominantFactorIndex]}</b> factor is the most dominant complaint (" . max($factorData) . "%)."
+                : "Faktor <b>{$factorNames[$dominantFactorIndex]}</b> menjadi keluhan paling dominan (" . max($factorData) . "%).";
+        }
+        
+        if(count($monthlyDistribution) > 0) {
+             $latestMonth = end($monthlyDistribution);
+             $keyFindings[] = $isEn
+                 ? "Month " . $latestMonth['month'] . " recorded " . $latestMonth['distress'] . " Distress cases."
+                 : "Bulan " . $latestMonth['month'] . " mencatatkan " . $latestMonth['distress'] . " kasus Distress.";
+        }
+
+
+
+        // Get Jurusans for Filter Dropdown
+        $jurusans = User::whereNotNull('jurusan')->distinct('jurusan')->pluck('jurusan');
+
         return view('admin.assessments', compact(
             'avgStressPercentage',
             'monthlyAssessments',
             'activeStudents',
             'highStressCount',
+            'highRiskUsersList',
             'monthlyDistribution',
             'semesterData',
             'factorData',
-            'jurusanStats'
+            'jurusanStats',
+            'aiInsight',
+            'recommendations',
+            'keyFindings',
+            'jurusans'
         ));
     }
 

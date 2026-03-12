@@ -11,6 +11,14 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     
     <script>
+        // Sync Laravel locale with JS localStorage
+        const serverLocale = '{{ app()->getLocale() }}';
+        if (localStorage.getItem('app_language') !== serverLocale) {
+            localStorage.setItem('app_language', serverLocale);
+            // Trigger storage event for other tabs/components
+            window.dispatchEvent(new Event('storage'));
+        }
+
         // Dark mode initialization - must run before page renders
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark')

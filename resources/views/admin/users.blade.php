@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Mahasiswa - Insight Stress</title>
+    <title>Monitoring Mahasiswa - Insight Stress</title>
     @vite('resources/css/app.css')
 </head>
 <body class="bg-slate-900 text-white">
@@ -28,7 +28,7 @@
                         </svg>
                     </button>
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                             </svg>
@@ -38,22 +38,18 @@
                 </div>
             </header>
             
-
-            
-
-            
             <!-- Header (Desktop) -->
             <header class="hidden lg:block bg-slate-800/30 border-b border-slate-700 px-4 lg:px-8 py-4 lg:py-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl lg:text-3xl font-bold">Kelola Mahasiswa</h1>
-                        <p class="text-slate-400 mt-1 text-sm lg:text-base">Lihat dan kelola data mahasiswa</p>
+                        <h1 class="text-2xl lg:text-3xl font-bold" data-i18n="page_title">Kelola Mahasiswa</h1>
+                        <p class="text-slate-400 mt-1 text-sm lg:text-base" data-i18n="page_subtitle">Lihat dan kelola data mahasiswa</p>
                     </div>
-                    <button onclick="openExportModal()" class="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
+                    <button onclick="openExportModal()" class="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-lg transition flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        Export PDF
+                        <span data-i18n="export_pdf">Export PDF</span>
                     </button>
                 </div>
             </header>
@@ -63,13 +59,13 @@
 
                 <!-- Mobile Page Title & Export Button -->
                 <div class="lg:hidden mb-6">
-                    <h1 class="text-2xl font-bold mb-1">Kelola Mahasiswa</h1>
-                    <p class="text-slate-400 text-sm mb-4">Lihat dan kelola data mahasiswa</p>
-                    <button onclick="openExportModal()" class="w-full px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                    <h1 class="text-2xl font-bold mb-1" data-i18n="page_title">Kelola Mahasiswa</h1>
+                    <p class="text-slate-400 text-sm mb-4" data-i18n="page_subtitle">Lihat dan kelola data mahasiswa</p>
+                    <button onclick="openExportModal()" class="w-full px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        Export PDF
+                        <span data-i18n="export_pdf">Export PDF</span>
                     </button>
                 </div>
 
@@ -106,6 +102,22 @@
                     </div>
                 @endif
 
+                <!-- Monitoring Statistic Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
+                        <p class="text-slate-400 text-sm mb-1" data-i18n="total_mahasiswa">Total Mahasiswa</p>
+                        <p class="text-3xl font-bold">{{ number_format($totalUsers ?? 0) }}</p>
+                    </div>
+                    <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
+                        <p class="text-slate-400 text-sm mb-1" data-i18n="mahasiswa_aktif_assessment">Mahasiswa Aktif Assessment</p>
+                        <p class="text-3xl font-bold text-teal-400">{{ number_format($activeUsers ?? 0) }}</p>
+                    </div>
+                    <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
+                        <p class="text-slate-400 text-sm mb-1" data-i18n="mahasiswa_risiko_tinggi">Mahasiswa Risiko Tinggi</p>
+                        <p class="text-3xl font-bold text-red-500">{{ number_format($highRiskUsers ?? 0) }}</p>
+                    </div>
+                </div>
+
                 <!-- Search Bar -->
                 <div class="mb-6">
                     <div class="relative max-w-md">
@@ -117,8 +129,9 @@
                         <input 
                             type="text" 
                             id="searchInput"
+                            data-i18n-placeholder="search_placeholder"
                             placeholder="Cari berdasarkan nama, NIM, atau jurusan..."
-                            class="w-full pl-12 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition"
+                            class="w-full pl-12 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition"
                         >
                     </div>
                 </div>
@@ -127,54 +140,71 @@
                 <div class="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
                     
                     <div class="px-6 py-4 border-b border-slate-700">
-                        <h3 class="text-lg font-bold">Daftar Mahasiswa ({{ $users->total() }})</h3>
+                        <h3 class="text-lg font-bold"><span data-i18n="daftar_mahasiswa">Daftar Mahasiswa</span> ({{ $users->total() }})</h3>
                     </div>
 
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead>
                                 <tr class="border-b border-slate-700 bg-slate-800/30">
-                                    <th class="text-left py-3 px-4 text-slate-400 font-medium text-sm">Nama</th>
-                                    <th class="text-left py-3 px-4 text-slate-400 font-medium text-sm">NIM</th>
-                                    <th class="text-left py-3 px-4 text-slate-400 font-medium text-sm">Jurusan</th>
-                                    <th class="text-left py-3 px-3 text-slate-400 font-medium text-sm">Semester</th>
-                                    <th class="text-left py-3 px-3 text-slate-400 font-medium text-sm">Assessment</th>
-                                    <th class="text-left py-3 px-4 text-slate-400 font-medium text-sm">Stress Terakhir</th>
-                                    <th class="text-left py-3 px-4 text-slate-400 font-medium text-sm">Aksi</th>
+                                    <th class="text-left py-3 px-4 text-slate-400 font-medium text-sm" data-i18n="col_nama">Nama</th>
+                                    <th class="text-left py-3 px-4 text-slate-400 font-medium text-sm" data-i18n="col_nim_jurusan">NIM / Jurusan</th>
+                                    <th class="text-left py-3 px-4 text-slate-400 font-medium text-sm" data-i18n="col_stress">Stress Terakhir</th>
+                                    <th class="text-left py-3 px-4 text-slate-400 font-medium text-sm" data-i18n="col_assessment">Assessment</th>
+                                    <th class="text-left py-3 px-4 text-slate-400 font-medium text-sm whitespace-nowrap" data-i18n="col_aksi">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="userTableBody">
                                 @forelse($users as $user)
-                                    <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
-                                        <td class="py-3 px-4">
+                                    @php
+                                        $isHighRisk = false;
+                                        if ($user->latest_assessment && $user->latest_assessment->numeric_score == 2) {
+                                            $isHighRisk = true;
+                                        }
+                                    @endphp
+                                    <tr class="border-b border-slate-700/50 hover:bg-slate-700/50 transition {{ $isHighRisk ? 'bg-red-500/5 border-l-4 border-l-red-500' : 'border-l-4 border-l-transparent' }}">
+                                        <td class="py-4 px-4">
                                             <div>
-                                                <p class="font-medium">{{ $user->name }}</p>
+                                                <p class="font-medium text-white">{{ $user->name }}</p>
                                                 <p class="text-sm text-slate-400">{{ $user->email }}</p>
                                             </div>
                                         </td>
-                                        <td class="py-3 px-4 text-slate-300">{{ $user->nim ?? 'N/A' }}</td>
-                                        <td class="py-3 px-4 text-slate-300 text-sm">{{ $user->jurusan ?? 'N/A' }}</td>
-                                        <td class="py-3 px-3 text-slate-300 text-center">{{ $user->semester ?? 'N/A' }}</td>
-                                        <td class="py-3 px-3 text-slate-300 text-center">{{ $user->assessments_count ?? 0 }}</td>
-                                        <td class="py-3 px-4">
+                                        <td class="py-4 px-4">
+                                            <p class="text-slate-300">{{ $user->nim ?? '-' }}</p>
+                                            <p class="text-sm text-slate-400">{{ $user->jurusan ?? '-' }} (Smst {{ $user->semester ?? '-' }})</p>
+                                        </td>
+                                        <td class="py-4 px-4">
                                             @if($user->latest_assessment)
                                                 @php
-                                                    $stressCategory = $user->latest_assessment->stress_category ?? 'Unknown';
-                                                    $category = match($stressCategory) {
-                                                        'No Stress' => ['text' => 'Rendah', 'class' => 'bg-green-500/20 text-green-400'],
-                                                        'Eustress' => ['text' => 'Sedang', 'class' => 'bg-blue-500/20 text-blue-400'],
-                                                        'Distress' => ['text' => 'Tinggi', 'class' => 'bg-red-500/20 text-red-400'],
-                                                        default => ['text' => 'Unknown', 'class' => 'bg-gray-500/20 text-gray-400']
-                                                    };
+                                                    $score = $user->latest_assessment->numeric_score;
+                                                    // Map 0=No Stress, 1=Eustress, 2=Distress to Aman, Perlu Perhatian, Risiko Tinggi
+                                                    if ($score == 0) {
+                                                        $badgeColor = 'bg-green-500/10 text-green-500 border border-green-500/20';
+                                                        $badgeText = '🟢 Aman';
+                                                    } elseif ($score == 1) {
+                                                        $badgeColor = 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20';
+                                                        $badgeText = '🟡 Perlu Perhatian';
+                                                    } else {
+                                                        $badgeColor = 'bg-red-500/10 text-red-500 border border-red-500/20';
+                                                        $badgeText = '🔴 Risiko Tinggi';
+                                                    }
                                                 @endphp
-                                                <span class="px-3 py-1 rounded-full text-xs font-medium {{ $category['class'] }} whitespace-nowrap">
-                                                    {{ $category['text'] }}
+                                                <span class="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center {{ $badgeColor }}">
+                                                    {{ $badgeText }}
                                                 </span>
                                             @else
-                                                <span class="text-slate-500 text-sm">-</span>
+                                                <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-800 text-slate-400 whitespace-nowrap">Belum Dinilai</span>
                                             @endif
                                         </td>
-                                        <td class="py-3 px-4">
+                                        <td class="py-4 px-4">
+                                            @if($user->latest_assessment)
+                                                <p class="text-slate-300">{{ $user->latest_assessment->created_at->format('d M Y') }}</p>
+                                                <p class="text-xs text-slate-500">{{ $user->latest_assessment->created_at->diffForHumans() }}</p>
+                                            @else
+                                                <span class="text-slate-500 text-sm">Belum Pernah</span>
+                                            @endif
+                                        </td>
+                                        <td class="py-4 px-4">
                                             <div class="flex items-center gap-2">
                                                 <!-- View -->
                                                 <button onclick="openModal({{ $user->id }})" class="p-2 hover:bg-slate-700 rounded-lg transition" title="Lihat Detail">
@@ -206,11 +236,13 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="py-12 text-center text-slate-500">
-                                            <svg class="w-16 h-16 mx-auto mb-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
-                                            </svg>
-                                            <p>Belum ada mahasiswa terdaftar</p>
+                                        <td colspan="5" class="py-12 text-center text-slate-500">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <svg class="w-16 h-16 mx-auto mb-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2-2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                                </svg>
+                                                <p data-i18n="empty_state">Belum ada data mahasiswa</p>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -507,6 +539,68 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // ===== MULTI-LANGUAGE (i18n) SYSTEM =====
+        const i18nUsers = {
+            id: {
+                page_title: 'Kelola Mahasiswa',
+                page_subtitle: 'Lihat dan kelola data mahasiswa',
+                export_pdf: 'Export PDF',
+                search_placeholder: 'Cari berdasarkan nama, NIM, atau jurusan...',
+                daftar_mahasiswa: 'Daftar Mahasiswa',
+                col_nama: 'Nama',
+                col_nim_jurusan: 'NIM / Jurusan',
+                col_stress: 'Stress Terakhir',
+                col_assessment: 'Assessment',
+                col_aksi: 'Aksi',
+                empty_state: 'Belum ada data mahasiswa',
+                total_mahasiswa: 'Total Mahasiswa',
+                mahasiswa_aktif_assessment: 'Mahasiswa Aktif Assessment',
+                mahasiswa_risiko_tinggi: 'Mahasiswa Risiko Tinggi',
+            },
+            en: {
+                page_title: 'Student Management',
+                page_subtitle: 'View and manage student data',
+                export_pdf: 'Export PDF',
+                search_placeholder: 'Search by name, student ID, or major...',
+                daftar_mahasiswa: 'Student List',
+                col_nama: 'Name',
+                col_nim_jurusan: 'Student ID / Major',
+                col_stress: 'Latest Stress',
+                col_assessment: 'Assessments',
+                col_aksi: 'Actions',
+                empty_state: 'No student data available',
+                total_mahasiswa: 'Total Students',
+                mahasiswa_aktif_assessment: 'Active Assessment Students',
+                mahasiswa_risiko_tinggi: 'High Risk Students',
+            }
+        };
+
+        function applyUsersI18n() {
+            const lang = (localStorage.getItem('app_language') || 'id').toLowerCase();
+            const t = i18nUsers[lang] || i18nUsers['id'];
+
+            // Text elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key] !== undefined) el.textContent = t[key];
+            });
+
+            // Placeholder elements
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (t[key] !== undefined) el.placeholder = t[key];
+            });
+        }
+
+        applyUsersI18n();
+
+        // React to language changes from other tabs / pages
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'app_language') applyUsersI18n();
+        });
+    </script>
 
     <script>
         // Student data from PHP

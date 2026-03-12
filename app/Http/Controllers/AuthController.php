@@ -168,7 +168,7 @@ class AuthController extends Controller
     $lastAssessment = $recent->first();
     
     // Convert label to category text
-    $lastCategory = 'Belum Ada';
+    $lastCategory = __('Not Available');
     if ($lastAssessment) {
         $label = $lastAssessment->numeric_score ?? $lastAssessment->predicted_stress;
         $lastCategory = match($label) {
@@ -180,7 +180,7 @@ class AuthController extends Controller
     }
 
     // Calculate trend (compare last 2 assessments)
-    $trend = 'N/A';
+    $trend = __('Not Available');
     if ($recent->count() >= 2) {
         $current = $recent[0]->numeric_score ?? $recent[0]->predicted_stress ?? 0;
         $previous = $recent[1]->numeric_score ?? $recent[1]->predicted_stress ?? 0;

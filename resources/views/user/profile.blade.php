@@ -6,8 +6,8 @@
     {{-- Header --}}
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Profil Mahasiswa</h1>
-            <p class="text-gray-500 dark:text-gray-400 mt-1">Kelola informasi profil Anda</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ __('Student Profile') }}</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">{{ __('Manage your profile information') }}</p>
         </div>
     </div>
 
@@ -19,12 +19,12 @@
                 
                 <div class="flex items-center justify-between mb-8">
                     <div>
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Informasi Pribadi</h2>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Data diri yang terdaftar di sistem</p>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('Personal Information') }}</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Registered personal data') }}</p>
                     </div>
                     <button type="button" onclick="enableEdit()" id="btn-edit" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-white transition flex items-center gap-2">
                         <i data-lucide="pencil" class="w-4 h-4"></i>
-                        Edit
+                        {{ __('Edit') }}
                     </button>
                 </div>
 
@@ -52,7 +52,7 @@
                     <div class="space-y-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
-                                <i data-lucide="user" class="w-4 h-4"></i> Nama Lengkap
+                                <i data-lucide="user" class="w-4 h-4"></i> {{ __('Full Name') }}
                             </label>
                             <input type="text" name="name" value="{{ $user->name }}" disabled
                                 class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-teal-500 transition disabled:opacity-100 disabled:bg-gray-50/50 dark:text-white font-medium">
@@ -60,7 +60,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
-                                <i data-lucide="mail" class="w-4 h-4"></i> Email
+                                <i data-lucide="mail" class="w-4 h-4"></i> {{ __('Email') }}
                             </label>
                             <input type="email" name="email" value="{{ $user->email }}" disabled
                                 class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-teal-500 transition disabled:opacity-100 disabled:bg-gray-50/50 dark:text-white font-medium">
@@ -68,7 +68,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
-                                <i data-lucide="hash" class="w-4 h-4"></i> NIM
+                                <i data-lucide="hash" class="w-4 h-4"></i> {{ __('Student ID') }}
                             </label>
                             <input type="text" name="nim" value="{{ $user->nim }}" disabled
                                 class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-teal-500 transition disabled:opacity-100 disabled:bg-gray-50/50 dark:text-white font-medium">
@@ -76,7 +76,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
-                                <i data-lucide="book-open" class="w-4 h-4"></i> Jurusan
+                                <i data-lucide="book-open" class="w-4 h-4"></i> {{ __('Major') }}
                             </label>
                             <select name="jurusan" disabled
                                 class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-teal-500 transition disabled:opacity-100 disabled:bg-gray-50/50 dark:text-white font-medium">
@@ -89,30 +89,30 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
-                                <i data-lucide="graduation-cap" class="w-4 h-4"></i> Semester
+                                <i data-lucide="graduation-cap" class="w-4 h-4"></i> {{ __('Semester') }}
                             </label>
                             <select name="semester" disabled
                                 class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-teal-500 transition disabled:opacity-100 disabled:bg-gray-50/50 dark:text-white font-medium">
                                 @for($i = 1; $i <= 8; $i++)
-                                    <option value="{{ $i }}" {{ $user->semester == $i ? 'selected' : '' }}>Semester {{ $i }}</option>
+                                    <option value="{{ $i }}" {{ $user->semester == $i ? 'selected' : '' }}>{{ __('Semester') }} {{ $i }}</option>
                                 @endfor
                             </select>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
-                                <i data-lucide="user" class="w-4 h-4"></i> Jenis Kelamin
+                                <i data-lucide="user" class="w-4 h-4"></i> {{ __('Gender') }}
                             </label>
                             <select name="gender" disabled
                                 class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-teal-500 transition disabled:opacity-100 disabled:bg-gray-50/50 dark:text-white font-medium">
-                                <option value="1" {{ $user->gender == 1 ? 'selected' : '' }}>Laki-laki</option>
-                                <option value="0" {{ $user->gender == 0 ? 'selected' : '' }}>Perempuan</option>
+                                <option value="1" {{ $user->gender == 1 ? 'selected' : '' }}>{{ __('Male') }}</option>
+                                <option value="0" {{ $user->gender == 0 ? 'selected' : '' }}>{{ __('Female') }}</option>
                             </select>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
-                                <i data-lucide="calendar" class="w-4 h-4"></i> Umur
+                                <i data-lucide="calendar" class="w-4 h-4"></i> {{ __('Age') }}
                             </label>
                             <input type="number" name="age" value="{{ $user->age }}" disabled
                                 class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border-none rounded-xl focus:ring-2 focus:ring-teal-500 transition disabled:opacity-100 disabled:bg-gray-50/50 dark:text-white font-medium">
@@ -121,10 +121,10 @@
 
                     <div id="action-buttons" class="hidden mt-8 flex gap-4">
                         <button type="button" onclick="cancelEdit()" class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                            Batal
+                            {{ __('Cancel') }}
                         </button>
                         <button type="submit" class="flex-1 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl shadow-lg shadow-teal-500/30 transition">
-                            Simpan Perubahan
+                            {{ __('Save Changes') }}
                         </button>
                     </div>
 
@@ -135,28 +135,28 @@
         {{-- Kolom Kanan: Statistik --}}
         <div class="space-y-6">
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">Statistik Anda</h3>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">{{ __('Your Statistics') }}</h3>
                 
                 <div class="grid grid-cols-2 gap-4">
                     
                     <div class="bg-teal-50 dark:bg-teal-900/20 p-5 rounded-2xl flex flex-col items-center justify-center text-center h-32">
                         <p class="text-3xl font-bold text-teal-600 dark:text-teal-400 mb-1">{{ $stats['total'] }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Total Assessment</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Total Assessment') }}</p>
                     </div>
 
                     <div class="bg-green-50 dark:bg-green-900/20 p-5 rounded-2xl flex flex-col items-center justify-center text-center h-32">
                         <p class="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">{{ $stats['last_score'] }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Skor Terakhir</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Latest Score') }}</p>
                     </div>
 
                     <div class="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-2xl flex flex-col items-center justify-center text-center h-32">
                         <p class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">{{ $stats['active_months'] }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Bulan Aktif</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Active Months') }}</p>
                     </div>
 
                     <div class="bg-purple-50 dark:bg-purple-900/20 p-5 rounded-2xl flex flex-col items-center justify-center text-center h-32">
                         <p class="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-1">{{ $stats['improvement'] }}%</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Peningkatan</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Improvement') }}</p>
                     </div>
 
                 </div>
@@ -166,8 +166,8 @@
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Keamanan Akun</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Update password akun Anda</p>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Account Security') }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Update your account password') }}</p>
                     </div>
                     <div class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full flex items-center justify-center">
                         <i data-lucide="lock" class="w-5 h-5"></i>
@@ -179,26 +179,26 @@
                     @method('PUT')
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password Saat Ini</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('Current Password') }}</label>
                         <input type="password" name="current_password" required
                             class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition dark:text-white">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password Baru</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('New Password') }}</label>
                         <input type="password" name="password" required
                             class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition dark:text-white">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Konfirmasi Password Baru</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('Confirm New Password') }}</label>
                         <input type="password" name="password_confirmation" required
                             class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition dark:text-white">
                     </div>
 
                     <button type="submit" class="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-xl shadow-lg shadow-orange-500/30 transition flex items-center justify-center gap-2">
                         <i data-lucide="save" class="w-4 h-4"></i>
-                        Update Password
+                        {{ __('Update Password') }}
                     </button>
                 </form>
             </div>
@@ -207,8 +207,8 @@
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Preferensi Email</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Kelola notifikasi email Anda</p>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Email Preferences') }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Manage your email notifications') }}</p>
                     </div>
                     <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center">
                         <i data-lucide="bell" class="w-5 h-5"></i>
@@ -270,10 +270,10 @@
                         <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-xl">
                             <div class="flex-1">
                                 <label for="email_reminder_enabled" class="block font-medium text-gray-900 dark:text-white mb-1">
-                                    Pengingat Assessment
+                                    {{ __('Assessment Reminder') }}
                                 </label>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    Terima email pengingat untuk melakukan assessment stres secara berkala
+                                    {{ __('Receive reminder emails to perform stress assessments regularly') }}
                                 </p>
                             </div>
                             <div class="ml-4">
@@ -289,14 +289,14 @@
                         @if($user->last_reminder_sent_at)
                         <div class="text-xs text-gray-500 dark:text-gray-400 px-4">
                             <i data-lucide="clock" class="w-3 h-3 inline"></i>
-                            Pengingat terakhir dikirim: {{ \Carbon\Carbon::parse($user->last_reminder_sent_at)->diffForHumans() }}
+                            {{ __('Last reminder sent:') }} {{ \Carbon\Carbon::parse($user->last_reminder_sent_at)->diffForHumans() }}
                         </div>
                         @endif
                     </div>
 
                     <button type="submit" class="w-full mt-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition flex items-center justify-center gap-2">
                         <i data-lucide="save" class="w-4 h-4"></i>
-                        Simpan Preferensi
+                        {{ __('Save Preferences') }}
                     </button>
                 </form>
             </div>

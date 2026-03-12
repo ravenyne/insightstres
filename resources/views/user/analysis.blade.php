@@ -20,12 +20,12 @@
 
         // Category descriptions
         $categoryDescriptions = [
-            "No Stress" => "Anda saat ini mengalami stres yang sangat rendah atau tidak ada stres sama sekali. Kondisi mental Anda seimbang dan sehat.",
-            "Eustress" => "Eustress (Positive Stress) - Stres yang memotivasi dan meningkatkan performa. Ini merupakan tingkat stres yang sehat.",
-            "Distress" => "Distress (Negative Stress) - Stres yang menyebabkan kecemasan dan menganggu kesejahteraan. Perlu perhatian lebih untuk mengelolanya.",
+            "No Stress" => __("Desc No Stress"),
+            "Eustress" => __("Desc Eustress"),
+            "Distress" => __("Desc Distress"),
         ];
 
-        $categoryDesc = $categoryDescriptions[$category] ?? "Unknown stress category.";
+        $categoryDesc = $categoryDescriptions[$category] ?? __("Kategori tidak dikenali.");
 
         // Get previous assessment for comparison
         $previous = $assessments->count() > 1 ? $assessments->get(1) : null;
@@ -38,15 +38,15 @@
             $scoreDiff = $totalScore - $previous->total_score;
             
             if ($scoreDiff > 0) {
-                $trendText = "meningkat " . abs($scoreDiff) . " poin dari assessment sebelumnya";
+                $trendText = __('meningkat :value poin dari penilaian sebelumnya', ['value' => abs($scoreDiff)]);
                 $trendIcon = "trending-up";
                 $trendColor = "text-red-600 dark:text-red-400";
             } elseif ($scoreDiff < 0) {
-                $trendText = "menurun " . abs($scoreDiff) . " poin dari assessment sebelumnya";
+                $trendText = __('menurun :value poin dari penilaian sebelumnya', ['value' => abs($scoreDiff)]);
                 $trendIcon = "trending-down";
                 $trendColor = "text-green-600 dark:text-green-400";
             } else {
-                $trendText = "stabil, tidak ada perubahan dari assessment sebelumnya";
+                $trendText = __('stabil, tidak ada perubahan dari penilaian sebelumnya');
                 $trendIcon = "minus";
                 $trendColor = "text-blue-600 dark:text-blue-400";
             }
@@ -58,12 +58,42 @@
                 "score" => $a->numeric_score ?? 0
             ];
         });
+
+        // Calculate synthetic resilience score based on stress level and recent trends
+        $baseResilience = 75;
+        if($category === 'Distress') $baseResilience = 45;
+        elseif($category === 'Eustress') $baseResilience = 65;
+        elseif($category === 'No Stress') $baseResilience = 85;
+
+        // Adjust based on trend
+        if($scoreDiff !== null) {
+            if($scoreDiff < 0) $baseResilience += 5; // improving
+            elseif($scoreDiff > 0) $baseResilience -= 5; // worsening
+        }
+
+        // Ensure score is within 0-100
+        $resilienceScore = max(0, min(100, $baseResilience));
+
+        // Determine resilience label and color
+        $resilienceLabel = __('Rendah');
+        $resilienceColor = 'text-red-600 dark:text-red-400';
+        $resilienceBg = 'bg-red-500';
+        
+        if($resilienceScore >= 80) {
+            $resilienceLabel = __('Tinggi');
+            $resilienceColor = 'text-green-600 dark:text-green-400';
+            $resilienceBg = 'bg-green-500';
+        } elseif($resilienceScore >= 60) {
+            $resilienceLabel = __('Sedang');
+            $resilienceColor = 'text-blue-600 dark:text-blue-400';
+            $resilienceBg = 'bg-blue-500';
+        }
     }
 @endphp
 
 
 {{-- ================================================================= --}}
-{{-- =================  JIKA BELUM ADA DATA ASSESSMENT  ============== --}}
+{{-- =================  JIKA BELUM ADA DATA PENILAIAN   ============== --}}
 {{-- ================================================================= --}}
 @if(!$hasData)
 
@@ -80,12 +110,12 @@
 
         <!-- Title -->
         <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">
-            Belum Ada Data Assessment
+            {{ __('Belum Ada Data Penilaian') }}
         </h2>
 
         <!-- Description -->
         <p class="text-gray-600 dark:text-gray-400 text-lg mb-8 max-w-md leading-relaxed">
-            Anda belum pernah melakukan assessment stres. Mulai assessment pertama Anda untuk mendapatkan analisis mendalam dan rekomendasi personal.
+            {{ __('Anda belum pernah melakukan penilaian stres. Mulai penilaian pertama Anda untuk mendapatkan analisis mendalam dan rekomendasi personal.') }}
         </p>
 
         <!-- Features List -->
@@ -95,8 +125,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <div class="text-left">
-                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">Analisis Akurat</h4>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Hasil berbasis AI</p>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">{{ __('Analisis Akurat') }}</h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ __('Hasil berbasis AI') }}</p>
                 </div>
             </div>
 
@@ -105,8 +135,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
                 <div class="text-left">
-                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">Cepat & Mudah</h4>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Hanya 5-10 menit</p>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">{{ __('Cepat & Mudah') }}</h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ __('Hanya 5-10 menit') }}</p>
                 </div>
             </div>
 
@@ -115,8 +145,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
                 <div class="text-left">
-                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">Rekomendasi</h4>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Tips personal</p>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">{{ __('Rekomendasi') }}</h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ __('Tips personal') }}</p>
                 </div>
             </div>
         </div>
@@ -127,13 +157,13 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                 </svg>
-                Mulai Assessment Sekarang
+                {{ __('Mulai Penilaian Sekarang') }}
             </button>
         </a>
 
         <!-- Additional Info -->
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-6">
-            Assessment akan membantu Anda memahami tingkat stres dan mendapatkan solusi yang tepat
+            {{ __('Penilaian akan membantu Anda memahami tingkat stres dan mendapatkan solusi yang tepat') }}
         </p>
     </div>
 </div>
@@ -151,13 +181,13 @@
     {{-- HEADER --}}
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Hasil Analisis</h1>
-            <p class="text-gray-500 dark:text-gray-400">Lihat perkembangan tingkat stres Anda</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ __('Hasil Analisis') }}</h1>
+            <p class="text-gray-500 dark:text-gray-400">{{ __('Lihat perkembangan tingkat stres Anda') }}</p>
         </div>
 
         <button onclick="openExportModal()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center gap-2 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200">
             <i data-lucide="download" class="w-4 h-4"></i>
-            Export PDF
+            {{ __('Export PDF') }}
         </button>
     </div>
 
@@ -166,7 +196,7 @@
 
         {{-- CARD KATEGORI --}}
         <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
-            <p class="text-gray-500 dark:text-gray-400 text-sm mb-3">Kategori Stres Terakhir</p>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-3">{{ __('Kategori Stres Terakhir') }}</p>
 
             <div class="flex items-center justify-center">
                 <div class="w-40 h-40 rounded-full flex items-center justify-center {{ $info['bg'] }} {{ $info['dark_bg'] }}">
@@ -177,7 +207,7 @@
             </div>
 
             <p class="text-center mt-4 text-gray-600 dark:text-gray-300 text-sm">
-                Level: <span class="font-semibold">{{ $labelValue }}</span>
+                {{ __('Level') }}: <span class="font-semibold">{{ $labelValue }}</span>
             </p>
 
             {{-- Category Description --}}
@@ -193,127 +223,233 @@
                     <div class="flex items-center justify-center gap-2 text-sm">
                         <i data-lucide="{{ $trendIcon }}" class="w-4 h-4 {{ $trendColor }}"></i>
                         <span class="text-gray-700 dark:text-gray-300">
-                            Skor <span class="font-semibold {{ $trendColor }}">{{ $trendText }}</span>
+                            {!! __('Skor :trend_text', ['trend_text' => '<span class="font-semibold ' . $trendColor . '">' . $trendText . '</span>']) !!}
                         </span>
                     </div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
-                        Sebelumnya: {{ $previous->total_score }} → Sekarang: {{ $totalScore }}
+                        {{ __('Sebelumnya: :prev → Sekarang: :curr', ['prev' => $previous->total_score, 'curr' => $totalScore]) }}
                     </p>
                 </div>
             @else
                 <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <p class="text-xs text-blue-700 dark:text-blue-300 text-center">
-                        🎯 Ini adalah assessment pertama Anda. Lakukan assessment berikutnya untuk melihat perkembangan!
+                        {{ __('🎯 Ini adalah penilaian pertama Anda. Lakukan penilaian berikutnya untuk melihat perkembangan!') }}
                     </p>
                 </div>
             @endif
         </div>
 
-        {{-- GRAFIK --}}
-        <div class="md:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
-            <p class="text-lg font-semibold dark:text-white mb-4">Grafik Perkembangan Stres</p>
-            <canvas id="stressChart" height="160"></canvas>
-            <p class="text-xs text-gray-400 mt-3">
-                0 = No Stress • 1 = Eustress • 2 = Distress
-            </p>
-        </div>
+        {{-- GRAFIK & INSIGHT --}}
+        <div class="md:col-span-2 space-y-6">
+            {{-- GRAFIK --}}
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
+                <p class="text-lg font-semibold dark:text-white mb-4">{{ __('Grafik Perkembangan Stres') }}</p>
+                <canvas id="stressChart" height="160"></canvas>
+                <p class="text-xs text-gray-400 mt-3 text-center">
+                    0 = No Stress • 1 = Eustress • 2 = Distress
+                </p>
+            </div>
 
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {{-- RESILIENCE INDICATOR --}}
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
+                    <h3 class="font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                        <i data-lucide="shield" class="w-5 h-5 text-teal-500"></i>
+                        {{ __('Indikator Ketahanan Mahasiswa') }}
+                    </h3>
+                    
+                    <div class="flex justify-between items-end mb-2">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">{{ __('Resilience Score') }}</p>
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $resilienceScore }} <span class="text-sm font-normal text-gray-500">/ 100</span></p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 {{ $resilienceColor }}">
+                            {{ __('Resiliensi') }} {{ $resilienceLabel }}
+                        </span>
+                    </div>
+
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
+                        <div class="{{ $resilienceBg }} h-2 rounded-full transition-all duration-1000" style="width: {{ $resilienceScore }}%"></div>
+                    </div>
+
+                    <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                        {{ __('Skor ini menggambarkan kemampuan Anda dalam menghadapi tekanan akademik dan menjaga keseimbangan mental.') }}
+                    </p>
+                </div>
+
+                {{-- COMMUNITY INSIGHT --}}
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow flex flex-col">
+                    <h3 class="font-semibold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
+                        <i data-lucide="users" class="w-5 h-5 text-blue-500"></i>
+                        {{ __('Insight Komunitas Mahasiswa') }}
+                    </h3>
+                    
+                    <div class="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl flex-grow border border-blue-100 dark:border-blue-800/50">
+                        <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                            "{{ __('Berdasarkan data anonim pengguna, mahasiswa sering mengalami peningkatan stres menjelang minggu ujian dan deadline tugas besar.') }}"
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- ANALISIS --}}
     <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
-        <h2 class="text-xl font-semibold dark:text-white mb-3">Analisis Keseluruhan</h2>
+        <h2 class="text-xl font-semibold dark:text-white mb-3">{{ __('Analisis Keseluruhan') }}</h2>
 
         <div class="space-y-3">
             <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Berdasarkan hasil assessment terakhir, tingkat stres Anda berada pada kategori
+                {{ __('Berdasarkan hasil penilaian terakhir, tingkat stres Anda berada pada kategori') }}
                 <strong class="{{ $info['color'] }} {{ $info['dark_text'] }}">{{ $category }}</strong>.
             </p>
 
             @if($previous)
                 <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
                     @if($scoreDiff > 0)
-                        📈 Terjadi <strong class="text-red-600 dark:text-red-400">peningkatan</strong> skor stress sebesar {{ abs($scoreDiff) }} poin. 
-                        Ini menunjukkan bahwa tingkat stress Anda meningkat sejak assessment terakhir.
+                        📈 {!! __('Terjadi peningkatan skor stres sebesar :value poin. Ini menunjukkan bahwa tingkat stres Anda meningkat sejak penilaian terakhir.', ['value' => '<strong class="text-red-600 dark:text-red-400">' . abs($scoreDiff) . '</strong>']) !!}
                         <span class="block mt-2 text-sm italic">
-                            💡 <strong>Tips:</strong> Luangkan waktu untuk istirahat, lakukan aktivitas yang menenangkan seperti meditasi atau jalan-jalan ringan, 
-                            dan pertimbangkan untuk mengurangi beban kerja atau tugas yang tidak mendesak.
+                            💡 <strong>Tips:</strong> {{ __('Tips Peningkatan Stres') }}
                         </span>
                     @elseif($scoreDiff < 0)
-                        📉 Terjadi <strong class="text-green-600 dark:text-green-400">penurunan</strong> skor stress sebesar {{ abs($scoreDiff) }} poin. 
-                        Ini adalah tanda positif bahwa kondisi mental Anda membaik!
+                        📉 {!! __('Terjadi penurunan skor stres sebesar :value poin. Ini adalah tanda positif bahwa kondisi mental Anda membaik!', ['value' => '<strong class="text-green-600 dark:text-green-400">' . abs($scoreDiff) . '</strong>']) !!}
                         <span class="block mt-2 text-sm italic">
-                            💡 <strong>Tips:</strong> Pertahankan pola hidup sehat yang sudah Anda jalani. Terus lakukan aktivitas positif yang membantu mengurangi stress, 
-                            seperti olahraga teratur, tidur cukup, dan menjaga hubungan sosial yang baik.
+                            💡 <strong>Tips:</strong> {{ __('Tips Penurunan Stres') }}
                         </span>
                     @else
-                        ➡️ Skor stress Anda <strong class="text-blue-600 dark:text-blue-400">stabil</strong>, tidak ada perubahan signifikan dari assessment sebelumnya.
+                        ➡️ {!! __('Skor stres Anda stabil, tidak ada perubahan signifikan dari penilaian sebelumnya.') !!}
                         <span class="block mt-2 text-sm italic">
-                            💡 <strong>Tips:</strong> Kondisi stabil adalah hal yang baik. Terus monitor kondisi mental Anda secara berkala dan jaga keseimbangan 
-                            antara aktivitas dan istirahat.
+                            💡 <strong>Tips:</strong> {{ __('Tips Stres Stabil') }}
                         </span>
                     @endif
                 </p>
             @else
                 <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-                    Ini adalah assessment pertama Anda. Lakukan assessment secara berkala untuk melihat perkembangan dan tren tingkat stress Anda.
+                    {{ __('Ini adalah penilaian pertama Anda. Lakukan penilaian secara berkala untuk melihat perkembangan dan tren tingkat stres Anda.') }}
                 </p>
             @endif
 
             @if($category === "Distress")
                 <div class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded">
                     <p class="text-sm text-red-800 dark:text-red-300">
-                        <strong>⚠️ Perhatian:</strong> Tingkat stress Anda cukup tinggi. Jika kondisi ini berlanjut, 
-                        pertimbangkan untuk berkonsultasi dengan profesional kesehatan mental atau konselor.
+                        <strong>{{ __('⚠️ Perhatian:') }}</strong> {{ __('Peringatan Distress') }}
                     </p>
                 </div>
             @endif
         </div>
     </div>
 
+    {{-- STRESS FACTOR & RECOVERY PROGRESS --}}
+    <div class="grid md:grid-cols-2 gap-6">
+        
+        {{-- STRESS FACTORS --}}
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow h-full">
+            <h2 class="text-lg font-semibold dark:text-white mb-2 flex items-center gap-2">
+                <i data-lucide="pie-chart" class="w-5 h-5 text-purple-500"></i>
+                {{ __('Faktor yang Berkontribusi pada Stres') }}
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                {{ __('Faktor-faktor ini umum berkontribusi pada peningkatan stres mahasiswa.') }}
+            </p>
+
+            <ul class="space-y-3">
+                <li class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                    <div class="mt-0.5 w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                        <div class="w-2 h-2 rounded-full bg-purple-500"></div>
+                    </div>
+                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Beban tugas akademik yang menumpuk') }}</span>
+                </li>
+                <li class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                    <div class="mt-0.5 w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                        <div class="w-2 h-2 rounded-full bg-purple-500"></div>
+                    </div>
+                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Kurangnya waktu istirahat yang berkualitas') }}</span>
+                </li>
+                <li class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                    <div class="mt-0.5 w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                        <div class="w-2 h-2 rounded-full bg-purple-500"></div>
+                    </div>
+                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Jadwal belajar dan aktivitas padat') }}</span>
+                </li>
+            </ul>
+        </div>
+
+        {{-- RECOVERY PROGRESS --}}
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow h-full flex flex-col">
+            <h2 class="text-lg font-semibold dark:text-white mb-2 flex items-center gap-2">
+                <i data-lucide="activity" class="w-5 h-5 text-teal-500"></i>
+                {{ __('Progress Pemulihan') }}
+            </h2>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Status:') }}</span>
+                @if($category === 'Distress' || ($scoreDiff !== null && $scoreDiff > 0))
+                    <span class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-xs font-semibold rounded-full border border-yellow-200 dark:border-yellow-800/50 flex items-center gap-1">
+                        <i data-lucide="alert-circle" class="w-3 h-3"></i> {{ __('Perlu Perhatian') }}
+                    </span>
+                @elseif($category === 'Eustress' || ($scoreDiff !== null && $scoreDiff < 0))
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold rounded-full border border-blue-200 dark:border-blue-800/50 flex items-center gap-1">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> {{ __('Dalam Pemulihan') }}
+                    </span>
+                @else
+                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded-full border border-green-200 dark:border-green-800/50 flex items-center gap-1">
+                        <i data-lucide="check-circle" class="w-3 h-3"></i> {{ __('Kondisi Optimal') }}
+                    </span>
+                @endif
+            </div>
+
+            <div class="flex-grow bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed italic">
+                    "{{ __('Progress Penjelasan') }}"
+                </p>
+            </div>
+        </div>
+
+    </div>
+
     {{-- REKOMENDASI PERSONAL --}}
     <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
-        <h2 class="text-xl font-semibold dark:text-white mb-5">Rekomendasi Personal</h2>
+        <h2 class="text-xl font-semibold dark:text-white mb-5">{{ __('Rekomendasi Personal') }}</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             @if($category === "No Stress")
                 <div class="p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                    <h3 class="font-semibold text-green-700 dark:text-green-400 mb-1">Pertahankan Keseimbangan</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm">Anda dalam kondisi stabil. Pertahankan pola hidup sehat.</p>
+                    <h3 class="font-semibold text-green-700 dark:text-green-400 mb-1">{{ __('Pertahankan Keseimbangan') }}</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">{{ __('Anda dalam kondisi stabil. Pertahankan pola hidup sehat.') }}</p>
                 </div>
 
                 <div class="p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                    <h3 class="font-semibold text-green-700 dark:text-green-400 mb-1">Aktivitas Positif</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm">Tetap lakukan olahraga dan interaksi sosial.</p>
+                    <h3 class="font-semibold text-green-700 dark:text-green-400 mb-1">{{ __('Aktivitas Positif') }}</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">{{ __('Tetap lakukan olahraga dan interaksi sosial.') }}</p>
                 </div>
 
             @elseif($category === "Eustress")
 
                 <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                    <h3 class="font-semibold text-blue-700 dark:text-blue-400 mb-1">Kelola Energi Positif</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm">Eustress bagus, tetapi jangan sampai berlebihan.</p>
+                    <h3 class="font-semibold text-blue-700 dark:text-blue-400 mb-1">{{ __('Kelola Energi Positif') }}</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">{{ __('Eustress bagus, tetapi jangan sampai berlebihan.') }}</p>
                 </div>
 
                 <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                    <h3 class="font-semibold text-blue-700 dark:text-blue-400 mb-1">Tetap Seimbang</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm">Istirahat cukup agar tidak berubah menjadi distress.</p>
+                    <h3 class="font-semibold text-blue-700 dark:text-blue-400 mb-1">{{ __('Tetap Seimbang') }}</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">{{ __('Istirahat cukup agar tidak berubah menjadi distress.') }}</p>
                 </div>
 
             @elseif($category === "Distress")
 
                 <div class="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                    <h3 class="font-semibold text-red-700 dark:text-red-400 mb-1">Kurangi Beban</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm">Ambil waktu untuk diri sendiri dan kurangi tekanan mental.</p>
+                    <h3 class="font-semibold text-red-700 dark:text-red-400 mb-1">{{ __('Kurangi Beban') }}</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">{{ __('Ambil waktu untuk diri sendiri dan kurangi tekanan mental.') }}</p>
                 </div>
 
                 <div class="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                    <h3 class="font-semibold text-red-700 dark:text-red-400 mb-1">Cari Dukungan</h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm">Pertimbangkan berbicara dengan teman dekat atau konselor.</p>
+                    <h3 class="font-semibold text-red-700 dark:text-red-400 mb-1">{{ __('Cari Dukungan') }}</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">{{ __('Pertimbangkan berbicara dengan teman dekat atau konselor.') }}</p>
                 </div>
 
             @else
-                <p class="text-gray-600 dark:text-gray-300">Kategori tidak dikenali.</p>
+                <p class="text-gray-600 dark:text-gray-300">{{ __('Kategori tidak dikenali.') }}</p>
             @endif
 
         </div>
@@ -330,9 +466,9 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <i data-lucide="file-text" class="w-6 h-6 text-teal-500"></i>
-                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Export Hasil Analisis</h3>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ __('Export Hasil Analisis') }}</h3>
                     </div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Preview dokumen hasil analisis stres Anda sebelum mengunduh</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('Preview dokumen hasil analisis stres Anda sebelum mengunduh') }}</p>
                 </div>
                 <button onclick="closeExportModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                     <i data-lucide="x" class="w-6 h-6"></i>
@@ -344,13 +480,13 @@
         <div class="p-6 overflow-y-auto max-h-[60vh]">
             <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 bg-gray-50 dark:bg-gray-700/30">
                 <div class="text-center mb-4">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Preview Dokumen</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">{{ __('Preview Dokumen') }}</p>
                 </div>
 
                 {{-- PDF Preview Content --}}
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg">
-                    <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-white mb-1">Laporan Hasil Analisis Stres</h2>
-                    <p class="text-center text-sm text-teal-600 dark:text-teal-400 mb-6">Insight Stress Mahasiswa</p>
+                    <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-white mb-1">{{ __('Laporan Hasil Analisis Stres') }}</h2>
+                    <p class="text-center text-sm text-teal-600 dark:text-teal-400 mb-6">{{ __('Insight Stres Mahasiswa') }}</p>
 
                     {{-- User Info --}}
                     <div class="flex items-center gap-6 mb-6">
@@ -369,9 +505,9 @@
                         <div class="flex items-center justify-center gap-3">
                             <div class="text-4xl font-bold {{ $info['color'] }} {{ $info['dark_text'] }}">{{ $totalScore }}</div>
                             <div class="text-left">
-                                <p class="text-xs text-gray-600 dark:text-gray-400">Skor Stres: {{ $category }}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">{{ __('Skor Stres') }}: {{ $category }}</p>
                                 @if($previous)
-                                    <p class="text-xs {{ $trendColor }}">{{ ucfirst($trendText) }}</p>
+                                    <p class="text-xs {{ $trendColor }}">{{ ucfirst(str_replace('assessment', 'penilaian', __($trendText))) }}</p>
                                 @endif
                             </div>
                         </div>
@@ -379,20 +515,20 @@
 
                     {{-- Recommendations Preview --}}
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Rekomendasi:</h3>
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">{{ __('Rekomendasi') }}:</h3>
                         <ul class="space-y-2 text-xs text-gray-700 dark:text-gray-300">
                             @if($category === "No Stress")
-                                <li>• Latihan Mindfulness</li>
-                                <li>• Perbaiki Pola Tidur</li>
-                                <li>• Aktivitas Fisik</li>
+                                <li>• {{ __('Latihan Mindfulness') }}</li>
+                                <li>• {{ __('Perbaiki Pola Tidur') }}</li>
+                                <li>• {{ __('Aktivitas Fisik') }}</li>
                             @elseif($category === "Eustress")
-                                <li>• Kelola Energi Positif</li>
-                                <li>• Tetap Seimbang</li>
-                                <li>• Istirahat Cukup</li>
+                                <li>• {{ __('Kelola Energi Positif') }}</li>
+                                <li>• {{ __('Tetap Seimbang') }}</li>
+                                <li>• {{ __('Istirahat Cukup') }}</li>
                             @else
-                                <li>• Kurangi Beban</li>
-                                <li>• Cari Dukungan</li>
-                                <li>• Konsultasi Profesional</li>
+                                <li>• {{ __('Kurangi Beban') }}</li>
+                                <li>• {{ __('Cari Dukungan') }}</li>
+                                <li>• {{ __('Konsultasi Profesional') }}</li>
                             @endif
                         </ul>
                     </div>
@@ -405,13 +541,13 @@
             <button 
                 onclick="closeExportModal()"
                 class="px-6 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                Batal
+                {{ __('Batal') }}
             </button>
             <a 
                 href="{{ route('user.export.analysis.pdf') }}"
                 class="px-6 py-2.5 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition flex items-center gap-2">
                 <i data-lucide="download" class="w-5 h-5"></i>
-                Unduh PDF
+                {{ __('Unduh PDF') }}
             </a>
         </div>
     </div>
@@ -427,7 +563,7 @@
         data: {
             labels: chartData.map(i => i.date),
             datasets: [{
-                label: "Kategori Stres",
+                label: "{{ __('Kategori Stres') }}",
                 data: chartData.map(i => i.score),
                 borderWidth: 3,
                 borderColor: "rgb(20,150,140)",

@@ -14,10 +14,10 @@ class NotificationController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
+
         // Get all notifications for the user
         $notifications = $user->notifications;
-        
+
         // Get unread count
         $unreadCount = $user->unread_notification_count;
 
@@ -32,7 +32,7 @@ class NotificationController extends Controller
         $notification = Notification::where('id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
-        
+
         $notification->markAsRead();
 
         return response()->json([
@@ -64,12 +64,24 @@ class NotificationController extends Controller
         $notification = Notification::where('id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
-        
+
         $notification->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Notification deleted'
+        ]);
+    }
+
+    /**
+     * Get unread notification count (for AJAX badge update)
+     */
+    public function getUnreadCount()
+    {
+        $count = Auth::user()->unread_notification_count ?? 0;
+
+        return response()->json([
+            'count' => $count,
         ]);
     }
 
@@ -88,4 +100,3 @@ class NotificationController extends Controller
         ]);
     }
 }
-

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - Insight Stress</title>
+    <title>{{ __('Login') }} - Insight Stress</title>
     @vite('resources/css/app.css')
 </head>
 
@@ -25,15 +25,15 @@
         @if(session('error'))
             <div class="bg-red-100 text-red-700 p-3 rounded-xl mb-4 text-center">
                 @if(session('need_verification'))
-                    Akun belum aktif atau belum diverifikasi. Silakan 
+                    {{ __('Account not yet active or not verified. Please') }}
                     <form action="{{ route('verification.resend.public') }}" method="POST" class="inline">
                         @csrf
                         <input type="hidden" name="email" value="{{ session('email_for_verification') }}">
                         <button type="submit" class="font-semibold underline text-teal-600 hover:text-teal-800">
-                            Kirim Ulang Email Verifikasi
+                            {{ __('Resend Verification Email') }}
                         </button>
                     </form>
-                    lalu cek email Anda.
+                    {{ __('then check your email.') }}
                 @else
                     {{ session('error') }}
                 @endif
@@ -42,15 +42,15 @@
 
         <div class="bg-white rounded-2xl shadow-md p-8 md:p-10">
 
-            <h2 class="text-2xl font-bold text-center">Selamat Datang Kembali</h2>
-            <p class="text-gray-500 text-center text-sm mb-6">Masuk ke akun Anda untuk melanjutkan</p>
+            <h2 class="text-2xl font-bold text-center">{{ __('Welcome Back') }}</h2>
+            <p class="text-gray-500 text-center text-sm mb-6">{{ __('Login to your account to continue') }}</p>
 
             <form action="{{ route('login.submit') }}" method="POST" class="space-y-4">
                 @csrf
 
                 {{-- Email --}}
                 <div>
-                    <label class="text-sm font-medium">Email</label>
+                    <label class="text-sm font-medium">{{ __('Email') }}</label>
                     <div class="relative mt-1">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2"> @include('components.icons.mail')</span>
                         <input type="email" name="email" required
@@ -62,8 +62,8 @@
                 {{-- Password --}}
                 <div>
                     <div class="flex justify-between">
-                        <label class="text-sm font-medium">Password</label>
-                        <a href="{{ route('password.request') }}" class="text-sm text-teal-600 hover:underline">Lupa password?</a>
+                        <label class="text-sm font-medium">{{ __('Password') }}</label>
+                        <a href="{{ route('password.request') }}" class="text-sm text-teal-600 hover:underline">{{ __('Forgot password?') }}</a>
                     </div>
                     <div class="relative mt-1">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2"> @include('components.icons.lock')</span>
@@ -75,13 +75,13 @@
 
                 <button type="submit"
                     class="w-full py-3 rounded-xl bg-gradient-to-r from-teal-500 to-teal-400 text-white font-semibold text-lg hover:opacity-90 transition">
-                    Masuk → 
+                    {{ __('Login') }} →
                 </button>
             </form>
 
             <p class="text-center text-sm text-gray-500 mt-6">
-                Belum punya akun?
-                <a href="{{ route('register') }}" class="text-teal-600 hover:underline font-medium">Daftar sekarang</a>
+                {{ __("Don't have an account?") }}
+                <a href="{{ route('register') }}" class="text-teal-600 hover:underline font-medium">{{ __('Register now') }}</a>
             </p>
 
         </div>

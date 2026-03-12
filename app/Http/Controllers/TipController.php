@@ -22,12 +22,41 @@ class TipController extends Controller
         // Search
         if ($search) {
             $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
+                $q->where('title_id', 'like', "%{$search}%")
+                  ->orWhere('title_en', 'like', "%{$search}%")
+                  ->orWhere('content_id', 'like', "%{$search}%")
+                  ->orWhere('content_en', 'like', "%{$search}%");
             });
         }
 
         $tips = $query->latest()->paginate(12);
+
+        // Fetch user's latest assessment and recommend tips
+        $user = auth()->user();
+        $recommendedTips = collect();
+        $latestAssessment = null;
+
+        if ($user) {
+            $latestAssessment = \App\Models\StressAssessment::where('user_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($latestAssessment) {
+                $recCategories = [];
+                if ($latestAssessment->stress_category === 'Distress') {
+                    $recCategories = ['breathing', 'mindfulness', 'general'];
+                } elseif ($latestAssessment->stress_category === 'Eustress') {
+                    $recCategories = ['study', 'exercise', 'general'];
+                } else { // No Stress
+                    $recCategories = ['sleep', 'mindfulness', 'general'];
+                }
+
+                $recommendedTips = Tip::whereIn('category', $recCategories)
+                    ->inRandomOrder()
+                    ->take(3)
+                    ->get();
+            }
+        }
 
         // Get category counts
         $categories = [
@@ -40,7 +69,7 @@ class TipController extends Controller
             'general' => Tip::where('category', 'general')->count(),
         ];
 
-        return view('user.tips', compact('tips', 'categories', 'category', 'search'));
+        return view('user.tips', compact('tips', 'categories', 'category', 'search', 'recommendedTips', 'latestAssessment'));
     }
 
     public function show($id)
@@ -51,8 +80,12 @@ class TipController extends Controller
         // Return JSON for AJAX requests
         return response()->json([
             'id' => $tip->id,
-            'title' => $tip->title,
-            'content' => $tip->content,
+            'title' => $tip->title, // Uses accessor
+            'title_id' => $tip->title_id,
+            'title_en' => $tip->title_en,
+            'content' => $tip->content, // Uses accessor
+            'content_id' => $tip->content_id,
+            'content_en' => $tip->content_en,
             'category' => $tip->category,
             'icon' => $tip->icon,
             'views' => $tip->views,

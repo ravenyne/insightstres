@@ -76,8 +76,8 @@ class AssessmentController extends Controller
                 return back()->with("error", "Machine Learning API mengembalikan error. Silakan coba lagi.");
             }
 
-            $label     = $response->json("label");     // 0 / 1 / 2
-            $category  = $response->json("category");  // No Stress / Eustress / Distress
+            $label = $response->json("label"); // 0 / 1 / 2
+            $category = $response->json("category"); // No Stress / Eustress / Distress
 
             // Validate response data
             if ($label === null || $category === null) {
@@ -118,17 +118,19 @@ class AssessmentController extends Controller
             // Calculate average score from answers (0-4 scale)
             $totalScore = array_sum($answers);
             $avgScore = $totalScore / count($answers);
-            
+
             // Determine expected category based on average
             // 0-1.5 = No Stress, 1.5-3 = Eustress, 3-4 = Distress
             $expectedCategory = null;
             if ($avgScore < 1.5) {
                 $expectedCategory = 'No Stress';
                 $expectedLabel = 0;
-            } elseif ($avgScore < 3.0) {
+            }
+            elseif ($avgScore < 3.0) {
                 $expectedCategory = 'Eustress';
                 $expectedLabel = 1;
-            } else {
+            }
+            else {
                 $expectedCategory = 'Distress';
                 $expectedLabel = 2;
             }
@@ -136,7 +138,7 @@ class AssessmentController extends Controller
             // Override ML prediction if it's unreasonable
             $originalCategory = $category;
             $originalLabel = $label;
-            
+
             // If ML says "No Stress" but avg > 3 (mostly "Sering/Sangat Sering")
             if ($category === 'No Stress' && $avgScore >= 3.0) {
                 $category = 'Distress';
@@ -147,7 +149,7 @@ class AssessmentController extends Controller
                     'avg_score' => $avgScore
                 ]);
             }
-            
+
             // If ML says "Eustress" but avg > 3.5 (almost all "Sangat Sering")
             if ($category === 'Eustress' && $avgScore >= 3.5) {
                 $category = 'Distress';
@@ -158,7 +160,7 @@ class AssessmentController extends Controller
                     'avg_score' => $avgScore
                 ]);
             }
-            
+
             // If ML says "Distress" but avg < 1 (mostly "Tidak Pernah")
             if ($category === 'Distress' && $avgScore < 1.0) {
                 $category = 'No Stress';
@@ -170,13 +172,15 @@ class AssessmentController extends Controller
                 ]);
             }
 
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+        }
+        catch (\Illuminate\Http\Client\ConnectionException $e) {
             \Log::error('Cannot connect to ML API', [
                 'error' => $e->getMessage(),
                 'user_id' => $user->id
             ]);
             return back()->with("error", "Tidak dapat terhubung ke Machine Learning API. Pastikan koneksi internet Anda stabil atau coba lagi nanti.");
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             \Log::error('ML API call failed', [
                 'error' => $e->getMessage(),
                 'user_id' => $user->id
@@ -216,17 +220,19 @@ class AssessmentController extends Controller
 
             // FINAL CLASSIFIER OUTPUT
             "predicted_stress" => $label,
-            "numeric_score" => $label,     // 0/1/2 → untuk grafik
+            "numeric_score" => $label, // 0/1/2 → untuk grafik
             "stress_category" => $category // teks kategori
         ]);
 
         // ===== CREATE NOTIFICATIONS =====
-        
+
         // 1. Success notification for assessment completion
         \App\Models\Notification::create([
             'user_id' => $user->id,
             'title' => 'Assessment Berhasil Disimpan',
+            'title_en' => 'Assessment Saved Successfully',
             'message' => 'Hasil assessment terakhir Anda telah tersimpan. Lihat hasil analisis dan rekomendasi personal Anda.',
+            'message_en' => 'Your latest assessment has been saved. View your analysis results and personalized recommendations.',
             'type' => 'success',
             'icon' => 'check-circle',
             'is_read' => false,
@@ -236,8 +242,10 @@ class AssessmentController extends Controller
         if ($category === 'Distress') {
             \App\Models\Notification::create([
                 'user_id' => $user->id,
-                'title' => 'Perhatian: Pola Tidur Anda',
-                'message' => 'Berdasarkan assessment terakhir, kualitas tidur Anda menurun. Coba terapkan tips tidur sehat kami.',
+                'title' => 'Peringatan: Tingkat Stres Tinggi',
+                'title_en' => 'Warning: High Stress Level Detected',
+                'message' => 'Tingkat stres Anda tergolong Distress. Luangkan waktu untuk istirahat, atau pertimbangkan untuk konsultasi dengan konselor.',
+                'message_en' => 'Your stress level is categorized as Distress. Take time to rest, or consider consulting a counselor.',
                 'type' => 'warning',
                 'icon' => 'alert-triangle',
                 'is_read' => false,
@@ -249,7 +257,9 @@ class AssessmentController extends Controller
             \App\Models\Notification::create([
                 'user_id' => $user->id,
                 'title' => 'Perhatian: Pola Tidur Anda',
+                'title_en' => 'Attention: Your Sleep Pattern',
                 'message' => 'Berdasarkan assessment terakhir, kualitas tidur Anda menurun. Coba terapkan tips tidur sehat kami.',
+                'message_en' => 'Based on your latest assessment, your sleep quality has decreased. Try applying our healthy sleep tips.',
                 'type' => 'warning',
                 'icon' => 'moon',
                 'is_read' => false,
@@ -262,7 +272,9 @@ class AssessmentController extends Controller
             \App\Models\Notification::create([
                 'user_id' => $user->id,
                 'title' => 'Pencapaian: ' . $totalAssessments . ' Assessment Selesai',
+                'title_en' => 'Achievement: ' . $totalAssessments . ' Assessments Completed',
                 'message' => 'Selamat! Anda telah menyelesaikan ' . $totalAssessments . ' assessment. Terus pantau kesehatan mental Anda.',
+                'message_en' => 'Congratulations! You have completed ' . $totalAssessments . ' assessments. Keep monitoring your mental health.',
                 'type' => 'success',
                 'icon' => 'trophy',
                 'is_read' => false,
@@ -272,15 +284,28 @@ class AssessmentController extends Controller
         // 5. Tips notification (random, 20% chance)
         if (rand(1, 100) <= 20) {
             $tips = [
-                'Kami telah menambahkan tips baru tentang teknik pernapasan untuk mengatasi kecemasan mendadak.',
-                'Tips baru tersedia! Pelajari cara membuat jadwal tidur yang konsisten untuk hasil yang lebih baik.',
-                'Coba teknik Pomodoro untuk meningkatkan fokus dan mengurangi stress akademik Anda.',
+                [
+                    'id' => 'Kami telah menambahkan tips baru tentang teknik pernapasan untuk mengatasi kecemasan mendadak.',
+                    'en' => 'We have added new tips on breathing techniques to overcome sudden anxiety.',
+                ],
+                [
+                    'id' => 'Tips baru tersedia! Pelajari cara membuat jadwal tidur yang konsisten untuk hasil yang lebih baik.',
+                    'en' => 'New tips available! Learn how to create a consistent sleep schedule for better results.',
+                ],
+                [
+                    'id' => 'Coba teknik Pomodoro untuk meningkatkan fokus dan mengurangi stress akademik Anda.',
+                    'en' => 'Try the Pomodoro technique to boost focus and reduce your academic stress.',
+                ],
             ];
-            
+
+            $selectedTip = $tips[array_rand($tips)];
+
             \App\Models\Notification::create([
                 'user_id' => $user->id,
                 'title' => 'Tips Baru Tersedia',
-                'message' => $tips[array_rand($tips)],
+                'title_en' => 'New Tips Available',
+                'message' => $selectedTip['id'],
+                'message_en' => $selectedTip['en'],
                 'type' => 'info',
                 'icon' => 'lightbulb',
                 'is_read' => false,
@@ -305,14 +330,15 @@ class AssessmentController extends Controller
 
         // Get all assessments first
         $assessments = StressAssessment::where('user_id', $user->id)
-                        ->orderBy('created_at', 'desc')->get();
+            ->orderBy('created_at', 'desc')->get();
 
         // If ID is provided, show that specific assessment
         if ($id) {
             $latest = StressAssessment::where('user_id', $user->id)
                 ->where('id', $id)
                 ->firstOrFail();
-        } else {
+        }
+        else {
             // Otherwise, show the latest assessment
             $latest = $assessments->first();
         }
@@ -327,29 +353,29 @@ class AssessmentController extends Controller
     {
         $user = Auth::user();
         $assessments = StressAssessment::where('user_id', $user->id)
-                        ->orderBy('created_at', 'desc')->get();
+            ->orderBy('created_at', 'desc')->get();
 
         // Calculate statistics
         $totalAssessments = $assessments->count();
-        
+
         $lowestScore = null;
         $highestScore = null;
         $averageScore = null;
-        
+
         if ($totalAssessments > 0) {
             // Get total scores for each assessment
-            $scores = $assessments->map(function($assessment) {
+            $scores = $assessments->map(function ($assessment) {
                 return $assessment->total_score;
             });
-            
+
             $lowestScore = $scores->min();
             $highestScore = $scores->max();
             $averageScore = round($scores->avg());
         }
 
         return view('user.assessment_history', compact(
-            'assessments', 
-            'user', 
+            'assessments',
+            'user',
             'totalAssessments',
             'lowestScore',
             'highestScore',
@@ -404,14 +430,16 @@ class AssessmentController extends Controller
                 'Batasi konsumsi kafein dan screen time sebelum tidur',
                 'Lakukan olahraga ringan secara teratur',
             ];
-        } elseif ($assessment->stress_category === 'Eustress') {
+        }
+        elseif ($assessment->stress_category === 'Eustress') {
             $recommendations = [
                 'Pertahankan pola hidup sehat yang sudah Anda jalani',
                 'Tetap kelola waktu dengan baik untuk menghindari stress berlebih',
                 'Jaga keseimbangan antara akademik dan kehidupan pribadi',
                 'Lakukan aktivitas yang Anda sukai secara rutin',
             ];
-        } else {
+        }
+        else {
             $recommendations = [
                 'Pertahankan kondisi mental yang baik',
                 'Tetap waspada terhadap perubahan pola stress',
@@ -467,7 +495,7 @@ class AssessmentController extends Controller
     {
         $user = Auth::user();
         $assessments = StressAssessment::where('user_id', $user->id)
-                        ->orderBy('created_at', 'desc')->get();
+            ->orderBy('created_at', 'desc')->get();
 
         $filename = 'assessment_' . $user->name . '_' . date('Y-m-d') . '.csv';
 
@@ -476,7 +504,7 @@ class AssessmentController extends Controller
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = function() use ($assessments) {
+        $callback = function () use ($assessments) {
             $file = fopen('php://output', 'w');
 
             // Header CSV

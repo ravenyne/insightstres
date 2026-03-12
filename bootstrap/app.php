@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
         $middleware->append(\App\Http\Middleware\CheckMaintenanceMode::class);
+        // SetLocale must run inside the 'web' group so StartSession has already run
+        // and session('locale') is available. Using append() would run it globally
+        // before the session is started, causing locale to always fall back to 'id'.
+        $middleware->appendToGroup('web', \App\Http\Middleware\SetLocale::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Handle CSRF Token Mismatch (Page Expired)

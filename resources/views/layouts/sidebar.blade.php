@@ -18,16 +18,21 @@
     </div>
 
     {{-- MENU --}}
-    <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+    <nav id="sidebar-nav" class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
 
-        {{-- Dashboard --}}
+        {{-- Dashboard (Main) --}}
         <a href="{{ route('dashboard') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
            {{ request()->is('dashboard') ? 'bg-teal-500 text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
             <i data-lucide="layout-dashboard"
                class="w-5 h-5 {{ request()->is('dashboard') ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}"></i>
-            Dashboard
+            {{ __('Dashboard') }}
         </a>
+
+        {{-- MONITORING SECTION --}}
+        <div class="pt-4 pb-1">
+            <p class="px-4 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ __('Monitoring') }}</p>
+        </div>
 
         {{-- Assessment --}}
         <a href="{{ route('user.assessment') }}"
@@ -35,7 +40,7 @@
            {{ request()->is('assessment*') ? 'bg-teal-500 text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
             <i data-lucide="clipboard-list"
                class="w-5 h-5 {{ request()->is('assessment*') ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}"></i>
-            Penilaian Stress
+            {{ __('Penilaian Stres') }}
         </a>
 
         {{-- Hasil Analisis --}}
@@ -44,34 +49,14 @@
            {{ request()->is('analysis') ? 'bg-teal-500 text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
             <i data-lucide="bar-chart-3"
                class="w-5 h-5 {{ request()->is('analysis') ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}"></i>
-            Hasil Analisis
+            {{ __('Hasil Analisis') }}
         </a>
 
-        {{-- Riwayat --}}
-        <a href="{{ route('user.history') }}"
-           class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
-           {{ request()->is('history') ? 'bg-teal-500 text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
-            <i data-lucide="history"
-               class="w-5 h-5 {{ request()->is('history') ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}"></i>
-            Riwayat Penilaian
-        </a>
 
-        {{-- Notifikasi --}}
-        <a href="{{ route('user.notifications') }}"
-           class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors relative
-           {{ request()->is('notifications') ? 'bg-teal-500 text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
-            <i data-lucide="bell"
-               class="w-5 h-5 {{ request()->is('notifications') ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}"></i>
-            Notifikasi
-            @php
-                $unreadCount = Auth::user()->unread_notification_count ?? 0;
-            @endphp
-            @if($unreadCount > 0)
-                <span class="absolute top-2 left-8 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {{ $unreadCount > 9 ? '9+' : $unreadCount }}
-                </span>
-            @endif
-        </a>
+        {{-- KELOLA STRES SECTION --}}
+        <div class="pt-4 pb-1">
+            <p class="px-4 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ __('Kelola Stres') }}</p>
+        </div>
 
         {{-- Tips & Artikel --}}
         <a href="{{ route('user.tips') }}"
@@ -79,7 +64,7 @@
            {{ request()->is('tips*') ? 'bg-teal-500 text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
             <i data-lucide="book-open"
                class="w-5 h-5 {{ request()->is('tips*') ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}"></i>
-            Insight & Edukasi
+            {{ __('Insight & Edukasi') }}
         </a>
 
         {{-- Latihan Pernapasan --}}
@@ -88,8 +73,44 @@
            {{ request()->is('breathing') ? 'bg-teal-500 text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
             <i data-lucide="wind"
                class="w-5 h-5 {{ request()->is('breathing') ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}"></i>
-            Latihan Pernapasan
+            {{ __('Latihan Pernapasan') }}
         </a>
+
+
+        {{-- RIWAYAT SECTION --}}
+        <div class="pt-4 pb-1">
+            <p class="px-4 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ __('Riwayat') }}</p>
+        </div>
+
+        {{-- Riwayat --}}
+        <a href="{{ route('user.history') }}"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors
+           {{ request()->is('history') ? 'bg-teal-500 text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+            <i data-lucide="history"
+               class="w-5 h-5 {{ request()->is('history') ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}"></i>
+            {{ __('Riwayat Penilaian') }}
+        </a>
+
+        {{-- Notifikasi --}}
+        <a href="{{ route('user.notifications') }}"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors relative
+           {{ request()->is('notifications') ? 'bg-teal-500 text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+            <i data-lucide="bell"
+               class="w-5 h-5 {{ request()->is('notifications') ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}"></i>
+            {{ __('Notifikasi') }}
+            @php
+                $unreadCount = Auth::user()->unread_notification_count ?? 0;
+            @endphp
+            <span id="sidebar-notif-badge" class="absolute top-2 left-8 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center {{ $unreadCount > 0 ? '' : 'hidden' }}">
+                {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+            </span>
+        </a>
+
+
+        {{-- AKUN SECTION --}}
+        <div class="pt-4 pb-1">
+            <p class="px-4 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ __('Akun') }}</p>
+        </div>
 
         {{-- Profil --}}
         <a href="{{ route('user.profile') }}"
@@ -97,31 +118,52 @@
            {{ request()->is('profile') ? 'bg-teal-500 text-white shadow-md' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
             <i data-lucide="user"
                class="w-5 h-5 {{ request()->is('profile') ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}"></i>
-            Profil
+            {{ __('Profil') }}
         </a>
 
     </nav>
 
-    {{-- DARK MODE TOGGLE --}}
-    <div class="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
-        <button id="darkModeToggle" 
+    {{-- BOTTOM SECTION: Language, Dark Mode, Logout --}}
+    <div class="px-4 pt-3 pb-4 border-t border-gray-200 dark:border-gray-700 space-y-1">
+
+        {{-- LANGUAGE TOGGLE --}}
+        <div class="flex items-center gap-3 px-4 py-3 rounded-xl">
+            <span class="text-base flex-shrink-0">🌐</span>
+            <div class="flex items-center gap-1">
+                <a href="{{ route('lang.switch', 'id') }}"
+                   class="px-2.5 py-1 text-xs font-bold rounded-md transition
+                   {{ app()->getLocale() === 'id' ? 'bg-teal-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                    ID
+                </a>
+                <span class="text-xs text-gray-400 dark:text-gray-500">/</span>
+                <a href="{{ route('lang.switch', 'en') }}"
+                   class="px-2.5 py-1 text-xs font-bold rounded-md transition
+                   {{ app()->getLocale() === 'en' ? 'bg-teal-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                    EN
+                </a>
+            </div>
+        </div>
+
+        {{-- DARK MODE TOGGLE --}}
+        <button id="darkModeToggle"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full transition-colors">
             <i data-lucide="moon" class="w-5 h-5 text-gray-500 dark:text-gray-400 dark-mode-icon"></i>
             <i data-lucide="sun" class="w-5 h-5 text-gray-500 dark:text-gray-400 light-mode-icon hidden"></i>
-            <span class="dark-mode-text">Mode Gelap</span>
-            <span class="light-mode-text hidden">Mode Terang</span>
+            <span class="dark-mode-text">{{ __('Mode Gelap') }}</span>
+            <span class="light-mode-text hidden">{{ __('Mode Terang') }}</span>
         </button>
-    </div>
 
-    {{-- LOGOUT --}}
-    <form action="{{ route('logout') }}" method="POST" class="px-4 pb-4">
-        @csrf
-        <button type="submit"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full transition-colors">
-            <i data-lucide="log-out" class="w-5 h-5 text-red-600 dark:text-red-400"></i>
-            Keluar
-        </button>
-    </form>
+        {{-- LOGOUT --}}
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full transition-colors">
+                <i data-lucide="log-out" class="w-5 h-5 text-red-600 dark:text-red-400"></i>
+                {{ __('Keluar') }}
+            </button>
+        </form>
+
+    </div>
 
 </div>
 
@@ -158,4 +200,35 @@
     
     // Initialize button state
     updateToggleButton();
+
+    // ===== Sidebar Scroll Persistence =====
+    const sidebarNav = document.getElementById('sidebar-nav');
+    const SIDEBAR_SCROLL_KEY = 'sidebar_scroll_pos';
+
+    // Restore scroll position
+    const savedScroll = sessionStorage.getItem(SIDEBAR_SCROLL_KEY);
+    if (savedScroll !== null && sidebarNav) {
+        sidebarNav.scrollTop = parseInt(savedScroll, 10);
+    }
+
+    // Save scroll position before navigating away
+    if (sidebarNav) {
+        sidebarNav.addEventListener('scroll', () => {
+            sessionStorage.setItem(SIDEBAR_SCROLL_KEY, sidebarNav.scrollTop);
+        });
+    }
+
+    // ===== Dynamic Notification Badge Update =====
+    // Global function pages can call to update sidebar badge without reload
+    window.updateSidebarNotifBadge = function(count) {
+        const badge = document.getElementById('sidebar-notif-badge');
+        if (!badge) return;
+        if (count <= 0) {
+            badge.classList.add('hidden');
+            badge.textContent = '0';
+        } else {
+            badge.classList.remove('hidden');
+            badge.textContent = count > 9 ? '9+' : count;
+        }
+    };
 </script>

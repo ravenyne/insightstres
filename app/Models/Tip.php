@@ -10,15 +10,23 @@ class Tip extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'content',
+        'title_id',
+        'title_en',
+        'content_id',
+        'content_en',
         'category',
         'icon',
         'views',
+        'target_condition',
+        'is_evidence_based',
+        'read_duration',
+        'is_ai_recommended',
     ];
 
     protected $casts = [
         'views' => 'integer',
+        'is_evidence_based' => 'boolean',
+        'is_ai_recommended' => 'boolean',
     ];
 
     // Category constants
@@ -39,5 +47,16 @@ class Tip extends Model
     public function incrementViews()
     {
         $this->increment('views');
+    }
+
+    // Accessors for bilingual support
+    public function getTitleAttribute()
+    {
+        return app()->getLocale() == 'en' ? $this->title_en : $this->title_id;
+    }
+
+    public function getContentAttribute()
+    {
+        return app()->getLocale() == 'en' ? $this->content_en : $this->content_id;
     }
 }
