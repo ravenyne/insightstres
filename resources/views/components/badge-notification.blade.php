@@ -12,13 +12,17 @@
                     $data = json_decode($notification->data, true);
                 @endphp
                 <div class="badge-toast transform transition-all duration-500 translate-x-full opacity-0 bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-4 flex items-center gap-4 border-l-4 border-teal-500 w-80"
-                     data-id="{{ $notification->id }}">
+                     data-id="{{ $notification->id }}"
+                     data-title-id="{{ $notification->title }}"
+                     data-title-en="{{ $notification->title_en ?? $notification->title }}"
+                     data-message-id="{{ $notification->message }}"
+                     data-message-en="{{ $notification->message_en ?? $notification->message }}">
                     <div class="flex-shrink-0 w-12 h-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center text-2xl">
                         {{ $data['badge_icon'] ?? '🏆' }}
                     </div>
                     <div class="flex-1">
-                        <h4 class="font-bold text-gray-900 dark:text-white mb-1">Badge Unlocked!</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">{{ $data['badge_name'] ?? 'New Badge' }}</p>
+                        <h4 class="badge-toast-title font-bold text-gray-900 dark:text-white mb-1">{{ $notification->title }}</h4>
+                        <p class="badge-toast-msg text-sm text-gray-600 dark:text-gray-300">{{ $notification->message }}</p>
                         <p class="text-xs text-teal-600 dark:text-teal-400 font-semibold mt-1">+{{ $data['points'] ?? 0 }} Points</p>
                     </div>
                     <button onclick="closeBadgeToast(this.closest('.badge-toast'))" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
@@ -32,38 +36,46 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                const lang = (localStorage.getItem('app_language') || 'id').toLowerCase();
                 const toasts = document.querySelectorAll('.badge-toast');
-                
+
                 toasts.forEach((toast, index) => {
+                    // Apply bilingual content immediately
+                    const titleId = toast.getAttribute('data-title-id');
+                    const titleEn = toast.getAttribute('data-title-en');
+                    const msgId   = toast.getAttribute('data-message-id');
+                    const msgEn   = toast.getAttribute('data-message-en');
+
+                    const titleEl = toast.querySelector('.badge-toast-title');
+                    const msgEl   = toast.querySelector('.badge-toast-msg');
+
+                    if (titleEl) titleEl.textContent = (lang === 'en' && titleEn) ? titleEn : (titleId || titleEl.textContent);
+                    if (msgEl)   msgEl.textContent   = (lang === 'en' && msgEn)   ? msgEn   : (msgId   || msgEl.textContent);
+
                     setTimeout(() => {
                         // Show toast
                         toast.classList.remove('translate-x-full', 'opacity-0');
-                        
+
                         // Mark as read via AJAX
                         const notificationId = toast.getAttribute('data-id');
                         markNotificationAsRead(notificationId);
-                        
+
                         // Auto dismiss after 5 seconds
                         setTimeout(() => {
-                            if (document.body.contains(toast)) {
-                                closeBadgeToast(toast);
-                            }
+                            if (document.body.contains(toast)) closeBadgeToast(toast);
                         }, 5000 + (index * 1000));
-                        
-                    }, index * 1000); // Stagger appearance
+
+                    }, index * 1000);
                 });
             });
 
             function closeBadgeToast(element) {
                 element.classList.add('translate-x-full', 'opacity-0');
-                setTimeout(() => {
-                    element.remove();
-                }, 500);
+                setTimeout(() => element.remove(), 500);
             }
 
             function markNotificationAsRead(id) {
                 if (!id) return;
-                
                 fetch(`/notifications/${id}/read`, {
                     method: 'POST',
                     headers: {
@@ -72,8 +84,8 @@
                         'Accept': 'application/json'
                     }
                 })
-                .then(response => console.log('Notification marked as read'))
-                .catch(error => console.error('Error marking notification as read:', error));
+                .then(() => console.log('Badge notification marked as read'))
+                .catch(error => console.error('Error marking badge as read:', error));
             }
         </script>
     @endif

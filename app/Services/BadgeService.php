@@ -88,9 +88,9 @@ class BadgeService
      */
     protected function checkTipReadingBadges(User $user)
     {
-        // Assuming you have a tips_viewed tracking mechanism
-        // For now, we'll skip this or implement later
-        // You could track this in a separate table or use a counter field
+    // Assuming you have a tips_viewed tracking mechanism
+    // For now, we'll skip this or implement later
+    // You could track this in a separate table or use a counter field
     }
 
     /**
@@ -98,8 +98,8 @@ class BadgeService
      */
     protected function checkBreathingBadges(User $user)
     {
-        // Similar to tips, you'd need a tracking mechanism
-        // Could be a breathing_sessions table or counter field
+    // Similar to tips, you'd need a tracking mechanism
+    // Could be a breathing_sessions table or counter field
     }
 
     /**
@@ -120,41 +120,41 @@ class BadgeService
      */
     protected function checkImprovementBadges(User $user)
     {
-        // TODO: Re-enable when total_score column is added to stress_assessments table
-        // Currently disabled to prevent database errors
-        
-        // Get last 3 assessments
-        // $recentAssessments = $user->assessments()
-        //     ->orderBy('created_at', 'desc')
-        //     ->take(3)
-        //     ->get();
+    // TODO: Re-enable when total_score column is added to stress_assessments table
+    // Currently disabled to prevent database errors
 
-        // if ($recentAssessments->count() >= 3) {
-        //     $scores = $recentAssessments->pluck('total_score')->toArray();
-        //     
-        //     // Check if stress is reducing (lower scores are better)
-        //     if ($scores[0] < $scores[1] && $scores[1] < $scores[2]) {
-        //         if (!$user->hasBadge('stress-reduction')) {
-        //             $badge = Badge::where('slug', 'stress-reduction')->first();
-        //             if ($badge) {
-        //                 $this->awardBadge($user, $badge);
-        //             }
-        //         }
-        //     }
-        // }
+    // Get last 3 assessments
+    // $recentAssessments = $user->assessments()
+    //     ->orderBy('created_at', 'desc')
+    //     ->take(3)
+    //     ->get();
 
-        // // Check for low stress maintenance
-        // $lowStressAssessments = $user->assessments()
-        //     ->where('created_at', '>=', Carbon::now()->subDays(30))
-        //     ->where('total_score', '<', 40) // Assuming < 40 is low stress
-        //     ->count();
+    // if ($recentAssessments->count() >= 3) {
+    //     $scores = $recentAssessments->pluck('total_score')->toArray();
+    //     
+    //     // Check if stress is reducing (lower scores are better)
+    //     if ($scores[0] < $scores[1] && $scores[1] < $scores[2]) {
+    //         if (!$user->hasBadge('stress-reduction')) {
+    //             $badge = Badge::where('slug', 'stress-reduction')->first();
+    //             if ($badge) {
+    //                 $this->awardBadge($user, $badge);
+    //             }
+    //         }
+    //     }
+    // }
 
-        // if ($lowStressAssessments >= 3 && !$user->hasBadge('low-stress-month')) {
-        //     $badge = Badge::where('slug', 'low-stress-month')->first();
-        //     if ($badge) {
-        //         $this->awardBadge($user, $badge);
-        //     }
-        // }
+    // // Check for low stress maintenance
+    // $lowStressAssessments = $user->assessments()
+    //     ->where('created_at', '>=', Carbon::now()->subDays(30))
+    //     ->where('total_score', '<', 40) // Assuming < 40 is low stress
+    //     ->count();
+
+    // if ($lowStressAssessments >= 3 && !$user->hasBadge('low-stress-month')) {
+    //     $badge = Badge::where('slug', 'low-stress-month')->first();
+    //     if ($badge) {
+    //         $this->awardBadge($user, $badge);
+    //     }
+    // }
     }
 
     /**
@@ -176,8 +176,10 @@ class BadgeService
         Notification::create([
             'user_id' => $user->id,
             'type' => 'badge_earned',
-            'title' => 'Badge Earned!',
-            'message' => "Congratulations! You've earned the '{$badge->name}' badge! {$badge->icon}",
+            'title' => 'Badge Diraih!',
+            'title_en' => 'Badge Earned!',
+            'message' => "Selamat! Kamu telah mendapatkan badge '{$badge->name}'! {$badge->icon}",
+            'message_en' => "Congratulations! You've earned the '{$badge->name}' badge! {$badge->icon}",
             'data' => json_encode([
                 'badge_id' => $badge->id,
                 'badge_name' => $badge->name,
@@ -230,20 +232,23 @@ class BadgeService
     public function updateLoginStreak(User $user)
     {
         $today = Carbon::today();
-        $lastLoginDate = $user->last_login_date ? Carbon::parse($user->last_login_date) : null;
+        $lastLoginDate = $user->last_login_date ?Carbon::parse($user->last_login_date) : null;
 
         if (!$lastLoginDate) {
             // First login
             $user->login_streak = 1;
             $user->last_login_date = $today;
-        } elseif ($lastLoginDate->isSameDay($today)) {
+        }
+        elseif ($lastLoginDate->isSameDay($today)) {
             // Already logged in today, no change
             return;
-        } elseif ($lastLoginDate->isYesterday()) {
+        }
+        elseif ($lastLoginDate->isYesterday()) {
             // Consecutive day
             $user->login_streak += 1;
             $user->last_login_date = $today;
-        } else {
+        }
+        else {
             // Streak broken
             $user->login_streak = 1;
             $user->last_login_date = $today;
